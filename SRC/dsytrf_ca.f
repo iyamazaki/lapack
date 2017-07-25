@@ -157,7 +157,7 @@
 *     .. Local Scalars ..
       LOGICAL            UPPER
       INTEGER            I, J, K, I1, I2
-      INTEGER            NB, NT
+      INTEGER            NB, KB, NT
       DOUBLE PRECISION   PIV
 *     ..
 *     .. External Functions ..
@@ -169,7 +169,7 @@
       EXTERNAL           XERBLA
 *     ..
 *     .. Intrinsic Functions ..
-      INTRINSIC          MAX
+      INTRINSIC          MIN, MAX
 *     ..
 *     .. Executable Statements ..
 *
@@ -222,11 +222,13 @@ c      WRITE(*,*) 'NB=',NB,'NT=',NT
          DO J = 0, NT-1
 *         
 *           Generate Jth column of W and H
-*         
+* 
+            KB = MIN(NB, N-J*NB)
+c            WRITE(*,*) '--',J,'--'
             DO I = 1, J-1
 *              H(I,J) = T(I,I)*L(J,I)'
                CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                      NB, NB, NB,
+     $                      NB, KB, NB,
      $                      ONE,  T( I*NB+1, I*NB+1 ), LDT,
      $                            A( J*NB+1, (I-1)*NB+1 ), LDA,
      $                      ZERO, H( I*NB+1, 1 ), LDH )
@@ -237,7 +239,7 @@ c               END DO
 c               WRITE(11,*)
 *              H(I,J) += Z, where Z = T(I+1,I)'*L(J,I+1)'
                CALL DGEMM( 'Transpose', 'Transpose',
-     $                      NB, NB, NB,
+     $                      NB, KB, NB,
      $                      ONE, T( (I+1)*NB+1, I*NB+1 ), LDT,
      $                           A( J*NB+1, I*NB+1 ), LDA,
      $                      ONE, H( I*NB+1, 1 ), LDH )
@@ -248,7 +250,7 @@ c               WRITE(11,*)
                IF( I.GT.1 ) THEN
 *                 H(I,J) += X where X = T(I,I-1)*L(J,I-1)'
                   CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                         NB, NB, NB,
+     $                         NB, KB, NB,
      $                         ONE, T( I*NB+1, (I-1)*NB+1 ), LDT,
      $                              A( J*NB+1, (I-2)*NB+1 ), LDA,
      $                         ONE, H( I*NB+1, 1 ), LDH )
@@ -258,7 +260,7 @@ c               WRITE(11,*)
 *           Compute T(J,J)
 *     
 c            WRITE(11,*) ' >> T(',J,',',J,')',NB
-            CALL DLACPY( 'Full', NB, NB, A( J*NB+1, J*NB+1 ), LDA,
+            CALL DLACPY( 'Full', KB, KB, A( J*NB+1, J*NB+1 ), LDA,
      $                   T( J*NB+1, J*NB+1 ), LDT ) 
             IF( J.GT.1 ) THEN
 c               DO K = 1, NB
@@ -267,7 +269,7 @@ c               END DO
 c               WRITE(11,*)
 *              T(J,J) = L(J,1:J)*H(1:J)             
                CALL DGEMM( 'NoTranspose', 'NoTranspose',
-     $                      NB, NB, J*NB,
+     $                      KB, KB, J*NB,
      $                     -ONE, A( J*NB+1, 1 ), LDA,
      $                           H( NB+1, 1 ), LDH,
      $                      ONE, T( J*NB+1, J*NB+1 ), LDT )
@@ -278,7 +280,7 @@ c               END DO
 c               WRITE(11,*) 'A(',J,',',J-1,'), T(',J,',',J-1,
 c     $                     '), A(',J,',',J-2,')'
                CALL DGEMM( 'NoTranspose', 'NoTranspose',
-     $                      NB, NB, NB,
+     $                      KB, NB, KB,
      $                      ONE,  A( J*NB+1, (J-1)*NB+1 ), LDA,
      $                            T( J*NB+1, (J-1)*NB+1 ), LDT,
      $                      ZERO, H( 1, 1 ), LDH )
@@ -290,7 +292,7 @@ c               DO K = 1, NB
 c                  WRITE(11,*) A(J*NB+K, (J-2)*NB+1:(J-1)*NB)
 c               END DO 
                CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                      NB, NB, NB,
+     $                      KB, KB, NB,
      $                     -ONE, H( 1, 1 ), LDH,
      $                           A( J*NB+1, (J-2)*NB+1 ), LDA,
      $                      ONE, T( J*NB+1, J*NB+1 ), LDT )
@@ -308,7 +310,7 @@ c               DO K = 1, NB
 c                  WRITE(11,*) A(J*NB+K, (J-1)*NB+1:(J-1)*NB+NB)
 c               END DO 
 c               WRITE(11,*)
-               CALL DSYGST( 1, 'Lower', NB, T( J*NB+1, J*NB+1 ), LDT, 
+               CALL DSYGST( 1, 'Lower', KB, T( J*NB+1, J*NB+1 ), LDT, 
      $                      A( J*NB+1, (J-1)*NB+1 ), LDA, INFO )
 c               DO K = 1, NB
 c                  WRITE(11,*) T(J*NB+K, J*NB+1:J*NB+NB)
@@ -317,8 +319,8 @@ c               END DO
 *
 *           Expand T(J,J) into full format
 *
-            DO I = 1, NB
-               DO K = I+1, NB
+            DO I = 1, KB
+               DO K = I+1, KB
                   T( J*NB+I, J*NB+K ) = T( J*NB+K, J*NB+I )
                END DO
             END DO
@@ -329,13 +331,13 @@ c               END DO
 *                 Compute H(J,J)
 *
                   CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                         NB, NB, NB,
+     $                         KB, KB, KB,
      $                         ONE,  T( J*NB+1, J*NB+1 ), LDT,
      $                               A( J*NB+1, (J-1)*NB+1 ), LDA,
      $                         ZERO, H( J*NB+1, 1 ), LDH )
                   IF( J.GT.1 ) THEN 
                      CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                            NB, NB, NB,
+     $                            KB, KB, KB,
      $                            ONE, T( J*NB+1, (J-1)*NB+1 ), LDT,
      $                                 A( J*NB+1, (J-2)*NB+1 ), LDA,
      $                            ONE, H( J*NB+1, 1 ), LDH )
@@ -380,15 +382,16 @@ c               END DO
 *              Compute T(J+1, J)     
 *     
 c               WRITE(*,*) 'T(',J+1,',',J,')'
-               CALL DLACPY( 'Upper', NB, NB,
+               KB = MIN(NB, N-(J+1)*NB)
+               CALL DLACPY( 'Upper', KB, NB,
      $                      A( (J+1)*NB+1, J*NB+1 ), LDA,
      $                      T( (J+1)*NB+1, J*NB+1 ), LDT )
                IF( J.GT.0 ) THEN 
-                  CALL DTRSM( 'R', 'L', 'T', 'U', NB, NB, ONE,
+                  CALL DTRSM( 'R', 'L', 'T', 'U', KB, NB, ONE,
      $                        A( J*NB+1, (J-1)*NB+1 ), LDA,
      $                        T( (J+1)*NB+1, J*NB+1 ), LDT )
                END IF
-               CALL DLASET( 'Upper', NB, NB, ZERO, ONE, 
+               CALL DLASET( 'Upper', KB, NB, ZERO, ONE, 
      $                      A( (J+1)*NB+1, J*NB+1), LDA )
 *              
 *              Apply pivots to trailing submatrix of A
@@ -398,8 +401,9 @@ c               DO K = 1, N
 c                  WRITE(11,*) A(K, 1:N)
 c               END DO 
 c               WRITE(11,*)
-               DO K = 1, NB
+               DO K = 1, KB
 *                 > Adjust ipiv               
+c                  WRITE(*,*) 'IPIV',(J+1)*NB+K
                   IPIV( (J+1)*NB+K ) = IPIV( (J+1)*NB+K ) + (J+1)*NB
 *                  
                   I1 = (J+1)*NB+K
@@ -428,7 +432,7 @@ c                     END DO
 *              Apply pivots to previous columns of L
 *         
                CALL DLASWP( J*NB, A( 1, 1 ), LDA, 
-     $                     (J+1)*NB+1, (J+2)*NB, IPIV, 1 )
+     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
 c               DO K = 1, N
 c                  WRITE(11,*) A(K, 1:N)
 c               END DO 
