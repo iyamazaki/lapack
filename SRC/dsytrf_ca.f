@@ -130,7 +130,7 @@
 *> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRF_CA( UPLO, N, A, LDA, T, LDT, H, LDH,
+      SUBROUTINE DSYTRF_CA( UPLO, N, NB, A, LDA, T, LDT, H, LDH,
      $                      IPIV, INFO)
 *
 *  -- LAPACK computational routine (version 3.7.0) --
@@ -175,8 +175,8 @@
 *
 *     Determine the block size
 *
-      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
-      NB = 5
+c      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
+c      NB = 5
       NT = (N+NB-1)/NB
 c      WRITE(*,*) 'NB=',NB,'NT=',NT
 *
@@ -224,7 +224,7 @@ c      WRITE(*,*) 'NB=',NB,'NT=',NT
 *           Generate Jth column of W and H
 * 
             KB = MIN(NB, N-J*NB)
-c            WRITE(*,*) '--',J,'--'
+c            WRITE(11,*) '--',J,'--'
             DO I = 1, J-1
 *              H(I,J) = T(I,I)*L(J,I)'
                CALL DGEMM( 'NoTranspose', 'Transpose',
