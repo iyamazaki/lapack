@@ -232,7 +232,7 @@ c            WRITE(11,*) '--',J,'--'
      $                      ONE,  T( I*NB+1, I*NB+1 ), LDT,
      $                            A( J*NB+1, (I-1)*NB+1 ), LDA,
      $                      ZERO, H( I*NB+1, 1 ), LDH )
-c               WRITE(11,*) 'H',I
+c               WRITE(11,*) 'H',I*NB+1
 c               DO K = 1, NB
 c                  WRITE(11,*) H(I*NB+K, 1:NB)
 c               END DO 
@@ -249,6 +249,15 @@ c               END DO
 c               WRITE(11,*)
                IF( I.GT.1 ) THEN
 *                 H(I,J) += X where X = T(I,I-1)*L(J,I-1)'
+c                  WRITE(11,*) ' xxxxxxxxxxxxxxx'
+c                  DO K = 1, NB
+c                     WRITE(11,*) T(I*NB+K, (I-1)*NB+1:(I-1)*NB+NB)
+c                  END DO 
+c                  WRITE(11,*)
+c                  DO K = 1, NB
+c                     WRITE(11,*) A(J*NB+K, (I-2)*NB+1:(I-2)*NB+NB)
+c                  END DO 
+c                  WRITE(11,*)
                   CALL DGEMM( 'NoTranspose', 'Transpose',
      $                         NB, KB, NB,
      $                         ONE, T( I*NB+1, (I-1)*NB+1 ), LDT,
@@ -263,13 +272,24 @@ c            WRITE(11,*) ' >> T(',J,',',J,')',NB
             CALL DLACPY( 'Full', KB, KB, A( J*NB+1, J*NB+1 ), LDA,
      $                   T( J*NB+1, J*NB+1 ), LDT ) 
             IF( J.GT.1 ) THEN
+c               WRITE(11,*) ' A(',J*NB+1,',1)'
+c               DO K = 1, KB
+c                  WRITE(11,*) A(J*NB+K, 1:J*NB)
+c               END DO 
+c               WRITE(11,*)
+c               WRITE(11,*) ' H(',NB+1,',1)'
+c               DO K = 1, J*NB
+c                  WRITE(11,*) H(NB+K, 1:KB)
+c               END DO 
+c               WRITE(11,*)
+c               WRITE(11,*) ' T(',J*NB+1,',',J*NB+1,')'
 c               DO K = 1, NB
 c                  WRITE(11,*) T(J*NB+K, J*NB+1:J*NB+NB)
 c               END DO 
 c               WRITE(11,*)
 *              T(J,J) = L(J,1:J)*H(1:J)             
                CALL DGEMM( 'NoTranspose', 'NoTranspose',
-     $                      KB, KB, J*NB,
+     $                      KB, KB, (J-1)*NB,
      $                     -ONE, A( J*NB+1, 1 ), LDA,
      $                           H( NB+1, 1 ), LDH,
      $                      ONE, T( J*NB+1, J*NB+1 ), LDT )
@@ -375,6 +395,10 @@ c               WRITE(11,*)
                CALL DGETRF( N-(J+1)*NB, NB, 
      $                      A( (J+1)*NB+1, J*NB+1 ), LDA,
      $                      IPIV( (J+1)*NB+1 ), INFO )
+c               WRITE(11,*) 'INFO=',INFO
+               IF (INFO.NE.0) THEN
+                  WRITE(*,*) 'DGETRF returned INFO=',INFO,' at J=',J
+               END IF
 c               DO K = (J+1)*NB+1, N
 c                  WRITE(*,*) K,' ',A(K, J*NB+1:(J+1)*NB)
 c               END DO 
@@ -403,7 +427,7 @@ c               END DO
 c               WRITE(11,*)
                DO K = 1, KB
 *                 > Adjust ipiv               
-c                  WRITE(*,*) 'IPIV',(J+1)*NB+K
+c                  WRITE(11,*) 'IPIV',(J+1)*NB+K
                   IPIV( (J+1)*NB+K ) = IPIV( (J+1)*NB+K ) + (J+1)*NB
 *                  
                   I1 = (J+1)*NB+K
@@ -427,6 +451,11 @@ c                     DO I1 = 1, N
 c                        WRITE(11,*) A(I1, 1:N)
 c                     END DO 
                   ENDIF   
+c                  WRITE(11,*) 'A(',(J+1)*NB+1,')'
+c                  DO I1 = 1, NB
+c                     WRITE(11,*) A((J+1)*NB+I1,
+c     $                             (J+1)*NB+1:(J+2)*NB)
+c                  END DO
                END DO   
 *         
 *              Apply pivots to previous columns of L
