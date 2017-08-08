@@ -202,8 +202,13 @@ c      WRITE(*,*) 'NB=',NB,'NT=',NT
       IF ( N.EQ.0 ) THEN
           RETURN
       ENDIF
-      IPIV( 1 ) = 1
-      IF ( N.EQ.1 ) THEN
+      KB = MIN(NB, N)
+      DO J = 1, KB
+         IPIV( J ) = J
+      END DO
+      IF ( N.LE.KB ) THEN
+         CALL DLACPY( 'Full', KB, KB, A( 1, 1 ), LDA,
+     $                T( 1, 1 ), LDT )
          RETURN
       END IF
 *
