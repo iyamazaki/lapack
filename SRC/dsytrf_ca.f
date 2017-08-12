@@ -131,7 +131,7 @@
 *
 *  =====================================================================
       SUBROUTINE DSYTRF_CA( UPLO, N, NB, A, LDA, TB, LDTB, H, LDH,
-     $                      IPIV, INFO)
+     $                      IPIV, IPIV2, INFO)
 *
 *  -- LAPACK computational routine (version 3.7.0) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -145,7 +145,7 @@
       INTEGER            N, LDA, LDTB, LDH, INFO
 *     ..
 *     .. Array Arguments ..
-      INTEGER            IPIV( * )
+      INTEGER            IPIV( * ), IPIV2( * )
       DOUBLE PRECISION   A( LDA, * ), TB( LDTB, *), H( LDH, * )
 *     ..
 *
@@ -375,6 +375,11 @@ c      NB = 5
      $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
             END IF
          END DO
+      END IF
+*
+*     Factor the band matrix
+      IF (INFO .EQ. 0) THEN
+         CALL DGBTRF( N, N, NB, NB, TB, LDTB, IPIV2, INFO )
       END IF
 *
 *     End of DSYTRF_CA
