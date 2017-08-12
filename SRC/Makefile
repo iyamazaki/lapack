@@ -346,7 +346,9 @@ DLASRC = \
    dsytf2_rk.o dsytrf_rk.o dsytrs_3.o \
    dsytri_3.o dsytri_3x.o dsycon_3.o dsysv_rk.o \
    dlasyf_aa.o dsysv_aa.o dsytrf_aa.o dsytrs_aa.o \
-   dsytrf_ca.o \
+   dsytrf_time.o dlasyf_time.o dsytrf_aa_time.o \
+   dsytrf_rook_time.o dlasyf_rook_time.o \
+   dsytrf_ca.o dsytrs_ca.o \
    dtbcon.o dtbrfs.o dtbtrs.o dtgevc.o dtgex2.o dtgexc.o dtgsen.o \
    dtgsja.o dtgsna.o dtgsy2.o dtgsyl.o dtpcon.o dtprfs.o dtptri.o \
    dtptrs.o \
