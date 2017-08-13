@@ -254,6 +254,7 @@
       DOUBLE PRECISION   ABSTOL, EPS, EMIN, MU, NRMU, NRMV, ORTOL, SMAX,
      $                   SMIN, SQRT2, THRESH, TOL, ULP, 
      $                   VLTGK, VUTGK, ZJTJI
+      LOGICAL            TRYRAC
 *     ..
 *     .. External Functions ..
       LOGICAL            LSAME
@@ -434,30 +435,33 @@
 *
          ILTGK = IL
          IUTGK = IU 
-         RNGVX = 'V'
-         WORK( IDTGK:IDTGK+2*N-1 ) = ZERO
-         CALL DCOPY( N, D, 1, WORK( IETGK ), 2 )
-         CALL DCOPY( N-1, E, 1, WORK( IETGK+1 ), 2 )
-         WRITE(*,*) 'DSTEVX 2'
-         CALL DSTEVX( 'N', 'I', N*2, WORK( IDTGK ), WORK( IETGK ), 
-     $                VLTGK, VLTGK, ILTGK, ILTGK, ABSTOL, NS, S,
-     $                Z, LDZ, WORK( ITEMP ), IWORK( IIWORK ),
-     $                IWORK( IIFAIL ), INFO )
-         VLTGK = S( 1 ) - FUDGE*SMAX*ULP*N
-         WORK( IDTGK:IDTGK+2*N-1 ) = ZERO
-         CALL DCOPY( N, D, 1, WORK( IETGK ), 2 )
-         CALL DCOPY( N-1, E, 1, WORK( IETGK+1 ), 2 )
-         CALL DSTEVX( 'N', 'I', N*2, WORK( IDTGK ), WORK( IETGK ), 
-     $                VUTGK, VUTGK, IUTGK, IUTGK, ABSTOL, NS, S,
-     $                Z, LDZ, WORK( ITEMP ), IWORK( IIWORK ),
-     $                IWORK( IIFAIL ), INFO )
-         VUTGK = S( 1 ) + FUDGE*SMAX*ULP*N
-         VUTGK = MIN( VUTGK, ZERO )
+c         RNGVX = 'V'
+c         WORK( IDTGK:IDTGK+2*N-1 ) = ZERO
+c         CALL DCOPY( N, D, 1, WORK( IETGK ), 2 )
+c         CALL DCOPY( N-1, E, 1, WORK( IETGK+1 ), 2 )
+c         WRITE(*,*) 'DSTEVX 2'
+c         WRITE(*,*) ' IDTGK:',IDTGK,' IETGK:',IETGK
+c         WRITE(*,*) ' ILTGK:',ILTGK
+c         CALL DSTEVX( 'N', 'I', N*2, WORK( IDTGK ), WORK( IETGK ), 
+c     $                VLTGK, VLTGK, ILTGK, ILTGK, ABSTOL, NS, S,
+c     $                Z, LDZ, WORK( ITEMP ), IWORK( IIWORK ),
+c     $                IWORK( IIFAIL ), INFO )
+c         VLTGK = S( 1 ) - FUDGE*SMAX*ULP*N
+c         WORK( IDTGK:IDTGK+2*N-1 ) = ZERO
+c         CALL DCOPY( N, D, 1, WORK( IETGK ), 2 )
+c         CALL DCOPY( N-1, E, 1, WORK( IETGK+1 ), 2 )
+c         WRITE(*,*) ' IUTGK:',IUTGK
+c         CALL DSTEVX( 'N', 'I', N*2, WORK( IDTGK ), WORK( IETGK ), 
+c     $                VUTGK, VUTGK, IUTGK, IUTGK, ABSTOL, NS, S,
+c     $                Z, LDZ, WORK( ITEMP ), IWORK( IIWORK ),
+c     $                IWORK( IIFAIL ), INFO )
+c         VUTGK = S( 1 ) + FUDGE*SMAX*ULP*N
+c         VUTGK = MIN( VUTGK, ZERO )
 *
 *        If VLTGK=VUTGK, DSTEVX returns an error message,
 *        so if needed we change VUTGK slightly.    
 *
-         IF( VLTGK.EQ.VUTGK ) VLTGK = VLTGK - TOL
+c         IF( VLTGK.EQ.VUTGK ) VLTGK = VLTGK - TOL
 *
          CALL DLASET( 'F', N*2, IU-IL+1, ZERO, ZERO, Z, LDZ )
       END IF             
@@ -501,6 +505,7 @@
 *          
             ISPLT = IDBEG
             IDEND = IEPTR - 1
+c            WRITE(*,*) 'IEPTR: ',IEPTR,':',IDBEG,',',IDEND
             DO IDPTR = IDBEG, IDEND, 2
                IF( WORK( IETGK+IDPTR-1 ).EQ.ZERO ) THEN
 *
@@ -586,25 +591,42 @@
 *                 WORK( ITEMP: ): 2*5*NTGK 
 *                 IWORK( 1: ): 2*6*NTGK
 *
-                  WRITE(*,*) 'DSTEVX 3 -> DSTEXR:',JOBZ,' ',RNGVX,' ',NTGK
-                  WRITE(*,*) ' IROWZ:',IROWZ,' ICOLZ:',ICOLZ
-                  WRITE(*,*) ' ILTGK:',ILTGK,' IUTGK:',IUTGK
-                  WRITE(*,*) ' LWORK:',LWORK,' LIWORK:',LIWORK
+c                  WRITE(*,*) 'IEPTR: ',IEPTR,' IDPTR:',IDPTR
+c                  WRITE(*,*) 'DSTEVX 3 -> DSTEXR: JOBZ=',JOBZ,
+c     $                       ' RNGVX=',RNGVX,
+c     $                       ' NTGK=',NTGK
+c                  WRITE(*,*) ' IROWZ:',IROWZ,' ICOLZ:',ICOLZ
+c                  WRITE(*,*) ' ILTGK:',ILTGK,' IUTGK:',IUTGK
+c                  WRITE(*,*) ' LWORK:',LWORK,' LIWORK:',LIWORK
+!#if defined(USE_DSTEVX)
+!                  WRITE(*,*) '** NEED TO UNCOMMENT DSTEVX ABOVE **'
 !                  CALL DSTEVX( JOBZ, RNGVX, NTGK, WORK( IDTGK+ISPLT-1 ),
 !     $                         WORK( IETGK+ISPLT-1 ), VLTGK, VUTGK, 
 !     $                         ILTGK, IUTGK, ABSTOL, NSL, S( ISBEG ), 
 !     $                         Z( IROWZ,ICOLZ ), LDZ, WORK( ITEMP ), 
 !     $                         IWORK( IIWORK ), IWORK( IIFAIL ),
 !     $                         INFO )
-                  CALL DSTEXR( NTGK, WORK( IDTGK+ISPLT-1 ), 
+!#elif defined(USE_DSTEMR)
+                  TRYRAC = .TRUE.
+                  CALL DSTEMR( JOBZ, RNGVX, NTGK, WORK( IDTGK+ISPLT-1 ),
      $                         WORK( IETGK+ISPLT-1 ),
-     $                         ILTGK, IUTGK,
+     $                         VL, VU, ILTGK, IUTGK, NSL,
      $                         S( ISBEG ), Z( IROWZ,ICOLZ ), LDZ,
-     $                         IWORK( IIFAIL ),
+     $                         NTGK, IWORK( IIFAIL ), TRYRAC,
      $                         WORK( ITEMP ), LWORK-ITEMP+1,
      $                         IWORK( IIWORK ), LIWORK-IIWORK+1,
      $                         INFO )
-                  NSL = IUTGK-ILTGK+1
+!#else
+!                  CALL DSTEXR( NTGK, WORK( IDTGK+ISPLT-1 ), 
+!     $                         WORK( IETGK+ISPLT-1 ),
+!     $                         ILTGK, IUTGK,
+!     $                         S( ISBEG ), Z( IROWZ,ICOLZ ), LDZ,
+!     $                         IWORK( IIFAIL ),
+!     $                         WORK( ITEMP ), LWORK-ITEMP+1,
+!     $                         IWORK( IIWORK ), LIWORK-IIWORK+1,
+!     $                         INFO )
+!                  NSL = IUTGK-ILTGK+1
+!#endif
 !                  WRITE(*,*) S(1:2*N)
                   IF( INFO.NE.0 ) THEN
 *                    Exit with the error code from DSTEVX.
