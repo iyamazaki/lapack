@@ -40,7 +40,8 @@
 *>    A = U*T*U**T  or  A = L*T*L**T
 *>
 *> where U (or L) is a product of permutation and unit upper (lower)
-*> triangular matrices, and T is a symmetric tridiagonal matrix.
+*> triangular matrices, and T is a symmetric band matrix with the
+*> band width of NB.
 *>
 *> This is the blocked version of the algorithm, calling Level 3 BLAS.
 *> \endverbatim
@@ -72,16 +73,37 @@
 *>          triangular part of the matrix A, and the strictly upper
 *>          triangular part of A is not referenced.
 *>
-*>          On exit, the tridiagonal matrix is stored in the diagonals
-*>          and the subdiagonals of A just below (or above) the diagonals,
-*>          and L is stored below (or above) the subdiaonals, when UPLO
-*>          is 'L' (or 'U').
+*>          On exit, L is stored below (or above) the subdiaonal blocks,
+*>          when UPLO  is 'L' (or 'U').
 *> \endverbatim
 *>
 *> \param[in] LDA
 *> \verbatim
 *>          LDA is INTEGER
 *>          The leading dimension of the array A.  LDA >= max(1,N).
+*> \endverbatim
+*>
+*> \param[out] TB
+*> \verbatim
+*>          TB is DOUBLE PRECISION array, dimension (LDTB, N)
+*>          On exit, details of the LU factorization of the band matrix.
+*> \endverbatim
+*>
+*> \param[in] LDTB
+*> \verbatim
+*>          The leading dimension of the array TB. LDTB >= 3*NB+1.
+*> \endverbatim
+*>
+*>
+*> \param[out] H
+*> \verbatim
+*>          H is DOUBLE PRECISION workspace, dimension (LDH, NB)
+*>          
+*> \endverbatim
+*>
+*> \param[in] LDH
+*> \verbatim
+*>          The leading dimension of the array H, LDH >= max(1,N).
 *> \endverbatim
 *>
 *> \param[out] IPIV
@@ -92,22 +114,12 @@
 *>          row and column IPIV(k).
 *> \endverbatim
 *>
-*> \param[out] WORK
+*> \param[out] IPIV2
 *> \verbatim
-*>          WORK is DOUBLE PRECISION array, dimension (MAX(1,LWORK))
-*>          On exit, if INFO = 0, WORK(1) returns the optimal LWORK.
-*> \endverbatim
-*>
-*> \param[in] LWORK
-*> \verbatim
-*>          LWORK is INTEGER
-*>          The length of WORK.  LWORK >= MAX(1,2*N). For optimum performance
-*>          LWORK >= N*(1+NB), where NB is the optimal blocksize.
-*>
-*>          If LWORK = -1, then a workspace query is assumed; the routine
-*>          only calculates the optimal size of the WORK array, returns
-*>          this value as the first entry of the WORK array, and no error
-*>          message related to LWORK is issued by XERBLA.
+*>          IPIV is INTEGER array, dimension (N)
+*>          On exit, it contains the details of the interchanges, i.e.,
+*>          the row and column k of T were interchanged with the
+*>          row and column IPIV(k).
 *> \endverbatim
 *>
 *> \param[out] INFO
@@ -115,6 +127,7 @@
 *>          INFO is INTEGER
 *>          = 0:  successful exit
 *>          < 0:  if INFO = -i, the i-th argument had an illegal value.
+*>          > 0:  if INFO = i, A(i,i) or T(i,i) is exactly zero.  
 *> \endverbatim
 *
 *  Authors:
@@ -130,7 +143,7 @@
 *> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRF_CA( UPLO, N, NB, A, LDA, TB, LDTB, H, LDH,
+      SUBROUTINE DSYTRF_CA( UPLO, FLAG, N, NB, A, LDA, TB, LDTB, H, LDH,
      $                      IPIV, IPIV2, INFO)
 *
 *  -- LAPACK computational routine (version 3.7.0) --
@@ -142,7 +155,7 @@
 *
 *     .. Scalar Arguments ..
       CHARACTER          UPLO
-      INTEGER            N, LDA, LDTB, LDH, INFO
+      INTEGER            FLAG, N, LDA, LDTB, LDH, INFO
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
@@ -151,13 +164,13 @@
 *
 *  =====================================================================
 *     .. Parameters ..
-      DOUBLE PRECISION   ZERO, ONE, HALF
-      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0, HALF = 5.0D-1 )
+      DOUBLE PRECISION   ZERO, ONE
+      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0 )
 *
 *     .. Local Scalars ..
       LOGICAL            UPPER
       INTEGER            I, J, K, I1, I2, TD
-      INTEGER            NB, KB, NT
+      INTEGER            NB, KB, NT, IINFO
       DOUBLE PRECISION   PIV
 *     ..
 *     .. External Functions ..
@@ -227,7 +240,7 @@ c      NB = 5
          DO J = 0, NT-1
 *         
 *           Generate Jth column of W and H
-* 
+*
             KB = MIN(NB, N-J*NB)
             DO I = 1, J-1
 *              H(I,J) = T(I,I)*L(J,I)'
@@ -277,7 +290,7 @@ c      NB = 5
             END IF
             IF( J.GT.0 ) THEN 
                CALL DSYGST( 1, 'Lower', KB, TB( TD+1, J*NB+1 ), LDTB-1, 
-     $                      A( J*NB+1, (J-1)*NB+1 ), LDA, INFO )
+     $                      A( J*NB+1, (J-1)*NB+1 ), LDA, IINFO )
             END IF
 *
 *           Expand T(J,J) into full format
@@ -300,10 +313,10 @@ c      NB = 5
      $                         ZERO, H( J*NB+1, 1 ), LDH )
                   IF( J.GT.1 ) THEN 
                      CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                            KB, KB, KB,
+     $                           KB, KB, NB,
      $                           ONE, TB( TD+NB+1, (J-1)*NB+1 ), LDTB-1,
-     $                                 A( J*NB+1, (J-2)*NB+1 ), LDA,
-     $                            ONE, H( J*NB+1, 1 ), LDH )
+     $                                A( J*NB+1, (J-2)*NB+1 ), LDA,
+     $                           ONE, H( J*NB+1, 1 ), LDH )
                   END IF
 *
 *                 Update with the previous column
@@ -316,8 +329,9 @@ c      NB = 5
                END IF
                CALL DGETRF( N-(J+1)*NB, NB, 
      $                      A( (J+1)*NB+1, J*NB+1 ), LDA,
-     $                      IPIV( (J+1)*NB+1 ), INFO )
-               IF (INFO.NE.0) THEN
+     $                      IPIV( (J+1)*NB+1 ), IINFO )
+               IF (IINFO.NE.0 .AND. INFO.EQ.0) THEN
+                  INFO = IINFO+NB
                   WRITE(*,*) 'DGETRF returned INFO=',INFO,' at J=',J
                END IF
 *         
@@ -366,19 +380,24 @@ c      NB = 5
                      PIV = A( I1, I1 )
                      A( I1, I1 ) = A( I2, I2 )
                      A( I2, I2 ) = PIV
+*                    > Apply pivots to previous columns of L
+                     IF( J.GT.0 ) THEN
+                        CALL DSWAP( J*NB, A( I1, 1 ), LDA,
+     $                                    A( I2, 1 ), LDA )
+                     END IF
                   ENDIF   
                END DO   
 *         
 *              Apply pivots to previous columns of L
 *         
-               CALL DLASWP( J*NB, A( 1, 1 ), LDA, 
-     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
+c               CALL DLASWP( J*NB, A( 1, 1 ), LDA, 
+c     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
             END IF
          END DO
       END IF
 *
 *     Factor the band matrix
-      IF (INFO .EQ. 0) THEN
+      IF (INFO .EQ. 0 .AND. FLAG.EQ.1) THEN
          CALL DGBTRF( N, N, NB, NB, TB, LDTB, IPIV2, INFO )
       END IF
 *
