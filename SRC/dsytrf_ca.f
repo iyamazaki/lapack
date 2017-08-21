@@ -243,25 +243,27 @@ c      NB = 5
 *
             KB = MIN(NB, N-J*NB)
             DO I = 1, J-1
-*              H(I,J) = T(I,I)*L(J,I)'
-               CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                      NB, KB, NB,
-     $                      ONE,  TB( TD+1, I*NB+1 ), LDTB-1,
-     $                            A( J*NB+1, (I-1)*NB+1 ), LDA,
-     $                      ZERO, H( I*NB+1, 1 ), LDH )
-*              H(I,J) += Z, where Z = T(I+1,I)'*L(J,I+1)'
-               CALL DGEMM( 'Transpose', 'Transpose',
-     $                      NB, KB, NB,
-     $                      ONE, TB( TD+NB+1, I*NB+1 ), LDTB-1,
-     $                           A( J*NB+1, I*NB+1 ), LDA,
-     $                      ONE, H( I*NB+1, 1 ), LDH )
-               IF( I.GT.1 ) THEN
-*                 H(I,J) += X where X = T(I,I-1)*L(J,I-1)'
+               IF( I.EQ.1 ) THEN
+*                  H(I,J) = T(I,I)*L(J,I)' + T(I+1,I)'*L(J,I+1)'
+                   CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                          NB, KB, 2*NB,
+     $                          ONE, TB( TD+1, I*NB+1 ), LDTB-1,
+     $                               A( J*NB+1, (I-1)*NB+1 ), LDA,
+     $                          ZERO, H( I*NB+1, 1 ), LDH )
+               ELSE IF( I .EQ. J-1) THEN
+*                 H(I,J) = T(I,I-1)*L(J,I-1)' + T(I,I)*L(J,I)' + T(I,I+1)*L(J,I+1)'
                   CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                         NB, KB, NB,
-     $                         ONE, TB( TD+NB+1, (I-1)*NB+1 ), LDTB-1,
-     $                              A( J*NB+1, (I-2)*NB+1 ), LDA,
-     $                         ONE, H( I*NB+1, 1 ), LDH )
+     $                         NB, KB, 2*NB+KB,
+     $                         ONE,  TB( TD+NB+1, (I-1)*NB+1 ), LDTB-1,
+     $                               A( J*NB+1, (I-2)*NB+1 ), LDA,
+     $                         ZERO, H( I*NB+1, 1 ), LDH )
+               ELSE
+*                 H(I,J) = T(I,I-1)*L(J,I-1)' + T(I,I)*L(J,I)' + T(I,I+1)*L(J,I+1)'
+                  CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                         NB, KB, 3*NB,
+     $                         ONE,  TB( TD+NB+1, (I-1)*NB+1 ), LDTB-1,
+     $                               A( J*NB+1, (I-2)*NB+1 ), LDA,
+     $                         ZERO, H( I*NB+1, 1 ), LDH )
                END IF
             END DO
 *         
@@ -306,17 +308,18 @@ c      NB = 5
 *
 *                 Compute H(J,J)
 *
-                  CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                         KB, KB, KB,
-     $                         ONE,  TB( TD+1, J*NB+1 ), LDTB-1,
-     $                               A( J*NB+1, (J-1)*NB+1 ), LDA,
-     $                         ZERO, H( J*NB+1, 1 ), LDH )
-                  IF( J.GT.1 ) THEN 
+                  IF( J.EQ.1 ) THEN
                      CALL DGEMM( 'NoTranspose', 'Transpose',
-     $                           KB, KB, NB,
+     $                            KB, KB, KB,
+     $                            ONE,  TB( TD+1, J*NB+1 ), LDTB-1,
+     $                                  A( J*NB+1, (J-1)*NB+1 ), LDA,
+     $                            ZERO, H( J*NB+1, 1 ), LDH )
+                  ELSE
+                     CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                           KB, KB, NB+KB,
      $                           ONE, TB( TD+NB+1, (J-1)*NB+1 ), LDTB-1,
      $                                A( J*NB+1, (J-2)*NB+1 ), LDA,
-     $                           ONE, H( J*NB+1, 1 ), LDH )
+     $                           ZERO, H( J*NB+1, 1 ), LDH )
                   END IF
 *
 *                 Update with the previous column
@@ -332,7 +335,7 @@ c      NB = 5
      $                      IPIV( (J+1)*NB+1 ), IINFO )
                IF (IINFO.NE.0 .AND. INFO.EQ.0) THEN
                   INFO = IINFO+NB
-                  WRITE(*,*) 'DGETRF returned INFO=',INFO,' at J=',J
+c                  WRITE(*,*) 'DGETRF returned INFO=',INFO,' at J=',J
                END IF
 *         
 *              Compute T(J+1, J)     
@@ -397,7 +400,7 @@ c     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
       END IF
 *
 *     Factor the band matrix
-      IF (INFO .EQ. 0 .AND. FLAG.EQ.1) THEN
+      IF (FLAG.EQ.1) THEN
          CALL DGBTRF( N, N, NB, NB, TB, LDTB, IPIV2, INFO )
       END IF
 *
