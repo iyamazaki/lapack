@@ -94,16 +94,14 @@
 *>          The leading dimension of the array TB. LDTB >= 3*NB+1.
 *> \endverbatim
 *>
-*>
-*> \param[out] H
+*> \param[out] WORK
 *> \verbatim
-*>          H is DOUBLE PRECISION workspace, dimension (LDH, NB)
-*>          
+*>          WORK is DOUBLE PRECISION workspace of size LWORK
 *> \endverbatim
 *>
-*> \param[in] LDH
+*> \param[in] LWORK
 *> \verbatim
-*>          The leading dimension of the array H, LDH >= max(1,N).
+*>          The size of WORK. LWORK >= N*NB.
 *> \endverbatim
 *>
 *> \param[out] IPIV
@@ -143,8 +141,8 @@
 *> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRF_CA( UPLO, FLAG, N, NB, A, LDA, TB, LDTB, H, LDH,
-     $                      IPIV, IPIV2, INFO)
+      SUBROUTINE DSYTRF_CA( UPLO, FLAG, N, NB, A, LDA, TB, LDTB, WORK,
+     $                      LWORK, IPIV, IPIV2, INFO)
 *
 *  -- LAPACK computational routine (version 3.7.0) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -155,11 +153,11 @@
 *
 *     .. Scalar Arguments ..
       CHARACTER          UPLO
-      INTEGER            FLAG, N, LDA, LDTB, LDH, INFO
+      INTEGER            FLAG, N, LDA, LDTB, LWORK, INFO
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
-      DOUBLE PRECISION   A( LDA, * ), TB( LDTB, *), H( LDH, * )
+      DOUBLE PRECISION   A( LDA, * ), TB( LDTB, *), WORK( * )
 *     ..
 *
 *  =====================================================================
@@ -249,21 +247,21 @@ c      NB = 5
      $                          NB, KB, 2*NB,
      $                          ONE, TB( TD+1, I*NB+1 ), LDTB-1,
      $                               A( J*NB+1, (I-1)*NB+1 ), LDA,
-     $                          ZERO, H( I*NB+1, 1 ), LDH )
+     $                          ZERO, WORK( I*NB+1 ), N )
                ELSE IF( I .EQ. J-1) THEN
 *                 H(I,J) = T(I,I-1)*L(J,I-1)' + T(I,I)*L(J,I)' + T(I,I+1)*L(J,I+1)'
                   CALL DGEMM( 'NoTranspose', 'Transpose',
      $                         NB, KB, 2*NB+KB,
      $                         ONE,  TB( TD+NB+1, (I-1)*NB+1 ), LDTB-1,
      $                               A( J*NB+1, (I-2)*NB+1 ), LDA,
-     $                         ZERO, H( I*NB+1, 1 ), LDH )
+     $                         ZERO, WORK( I*NB+1 ), N )
                ELSE
 *                 H(I,J) = T(I,I-1)*L(J,I-1)' + T(I,I)*L(J,I)' + T(I,I+1)*L(J,I+1)'
                   CALL DGEMM( 'NoTranspose', 'Transpose',
      $                         NB, KB, 3*NB,
      $                         ONE,  TB( TD+NB+1, (I-1)*NB+1 ), LDTB-1,
      $                               A( J*NB+1, (I-2)*NB+1 ), LDA,
-     $                         ZERO, H( I*NB+1, 1 ), LDH )
+     $                         ZERO, WORK( I*NB+1 ), N )
                END IF
             END DO
 *         
@@ -276,17 +274,17 @@ c      NB = 5
                CALL DGEMM( 'NoTranspose', 'NoTranspose',
      $                      KB, KB, (J-1)*NB,
      $                     -ONE, A( J*NB+1, 1 ), LDA,
-     $                           H( NB+1, 1 ), LDH,
+     $                           WORK( NB+1 ), N,
      $                      ONE, TB( TD+1, J*NB+1 ), LDTB-1 )
 *              T(J,J) += L(J,J)*T(J,J-1)*L(J,J-1)'
                CALL DGEMM( 'NoTranspose', 'NoTranspose',
      $                      KB, NB, KB,
      $                      ONE,  A( J*NB+1, (J-1)*NB+1 ), LDA,
      $                            TB( TD+NB+1, (J-1)*NB+1 ), LDTB-1,
-     $                      ZERO, H( 1, 1 ), LDH )
+     $                      ZERO, WORK( 1 ), N )
                CALL DGEMM( 'NoTranspose', 'Transpose',
      $                      KB, KB, NB,
-     $                     -ONE, H( 1, 1 ), LDH,
+     $                     -ONE, WORK( 1 ), N,
      $                           A( J*NB+1, (J-2)*NB+1 ), LDA,
      $                      ONE, TB( TD+1, J*NB+1 ), LDTB-1 )
             END IF
@@ -313,13 +311,13 @@ c      NB = 5
      $                            KB, KB, KB,
      $                            ONE,  TB( TD+1, J*NB+1 ), LDTB-1,
      $                                  A( J*NB+1, (J-1)*NB+1 ), LDA,
-     $                            ZERO, H( J*NB+1, 1 ), LDH )
+     $                            ZERO, WORK( J*NB+1 ), N )
                   ELSE
                      CALL DGEMM( 'NoTranspose', 'Transpose',
      $                           KB, KB, NB+KB,
      $                           ONE, TB( TD+NB+1, (J-1)*NB+1 ), LDTB-1,
-     $                                A( J*NB+1, (J-2)*NB+1 ), LDA,
-     $                           ZERO, H( J*NB+1, 1 ), LDH )
+     $                                 A( J*NB+1, (J-2)*NB+1 ), LDA,
+     $                           ZERO, WORK( J*NB+1 ), N )
                   END IF
 *
 *                 Update with the previous column
@@ -327,7 +325,7 @@ c      NB = 5
                   CALL DGEMM( 'NoTranspose', 'NoTranspose',
      $                         N-(J+1)*NB, NB, J*NB,
      $                        -ONE, A( (J+1)*NB+1, 1 ), LDA,
-     $                              H( NB+1, 1 ), LDH,
+     $                              WORK( NB+1 ), N,
      $                         ONE, A( (J+1)*NB+1, J*NB+1 ), LDA )
                END IF
                CALL DGETRF( N-(J+1)*NB, NB, 
