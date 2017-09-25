@@ -259,7 +259,7 @@
 *> \ingroup doubleGEsing
 *
 *  =====================================================================
-      SUBROUTINE DGESVDR( JOBU, JOBVT, RANGE, M, N, A, LDA, VL, VU,
+      SUBROUTINE DGESVDM( JOBU, JOBVT, RANGE, M, N, A, LDA, VL, VU,
      $                    IL, IU, NS, S, U, LDU, VT, LDVT, WORK,
      $                    LWORK, IWORK, LIWORK, INFO )
 *
@@ -297,7 +297,7 @@
       DOUBLE PRECISION   DUM( 1 )
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DBDSVDR, DGEBRD, DGELQF, DGEQRF, DLACPY,
+      EXTERNAL           DBDSVDM, DGEBRD, DGELQF, DGEQRF, DLACPY,
      $                   DLASCL, DLASET, DORMBR, DORMLQ, DORMQR,
      $                   XERBLA
 *     ..
@@ -467,7 +467,7 @@
       END IF
 *
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DGESVDR', -INFO )
+         CALL XERBLA( 'DGESVDM', -INFO )
          RETURN
       ELSE IF( LQUERY ) THEN
          RETURN
@@ -555,7 +555,7 @@ c         RNGTGK = 'I'
 *
             ITGKZ = ITEMP
             ITEMP = ITGKZ + N*(N*2+1)
-            CALL DBDSVDR( 'U', JOBZ, RNGTGK, N, WORK( ID ), WORK( IE ),
+            CALL DBDSVDM( 'U', JOBZ, RNGTGK, N, WORK( ID ), WORK( IE ),
      $                    VL, VU, ILTGK, IUTGK, NS, S, WORK( ITGKZ ),
      $                    N*2, WORK( ITEMP ), LWORK-ITEMP+1, 
      $                    IWORK, LIWORK, INFO)
@@ -625,7 +625,7 @@ c         RNGTGK = 'I'
 *
             ITGKZ = ITEMP
             ITEMP = ITGKZ + N*(N*2+1)
-            CALL DBDSVDR( 'U', JOBZ, RNGTGK, N, WORK( ID ), WORK( IE ),
+            CALL DBDSVDM( 'U', JOBZ, RNGTGK, N, WORK( ID ), WORK( IE ),
      $                    VL, VU, ILTGK, IUTGK, NS, S, WORK( ITGKZ ),
      $                    N*2, WORK( ITEMP ), LWORK-ITEMP+1, 
      $                    IWORK, LIWORK, INFO)
@@ -705,7 +705,7 @@ c         RNGTGK = 'I'
 *
             ITGKZ = ITEMP
             ITEMP = ITGKZ + M*(M*2+1)
-            CALL DBDSVDR( 'U', JOBZ, RNGTGK, M, WORK( ID ), WORK( IE ),
+            CALL DBDSVDM( 'U', JOBZ, RNGTGK, M, WORK( ID ), WORK( IE ),
      $                    VL, VU, ILTGK, IUTGK, NS, S, WORK( ITGKZ ),
      $                    M*2, WORK( ITEMP ), LWORK-ITEMP+1, 
      $                    IWORK, LIWORK, INFO)
@@ -775,7 +775,7 @@ c         RNGTGK = 'I'
 *
             ITGKZ = ITEMP
             ITEMP = ITGKZ + M*(M*2+1)
-            CALL DBDSVDR( 'L', JOBZ, RNGTGK, M, WORK( ID ), WORK( IE ),
+            CALL DBDSVDM( 'L', JOBZ, RNGTGK, M, WORK( ID ), WORK( IE ),
      $                    VL, VU, ILTGK, IUTGK, NS, S, WORK( ITGKZ ),
      $                    M*2, WORK( ITEMP ), LWORK-ITEMP+1, 
      $                    IWORK, LIWORK, INFO)

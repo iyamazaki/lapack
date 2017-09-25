@@ -290,7 +290,7 @@ ZCLASRC = cpotrs.o cgetrs.o cpotrf.o cgetrf.o
 
 DLASRC = \
    dpotrf2.o dgetrf2.o \
-   dbdsvdx.o dbdsvdr.o \
+   dbdsvdx.o dbdsvdm.o dbdsvdr.o \
    dgbbrd.o dgbcon.o dgbequ.o dgbrfs.o dgbsv.o \
    dgbsvx.o dgbtf2.o dgbtrf.o dgbtrs.o dgebak.o dgebal.o dgebd2.o \
    dgebrd.o dgecon.o dgeequ.o dgees.o  dgeesx.o dgeev.o  dgeevx.o \
@@ -298,7 +298,7 @@ DLASRC = \
    dgels.o  dgelsd.o dgelss.o dgelsy.o dgeql2.o dgeqlf.o \
    dgeqp3.o dgeqr2.o dgeqr2p.o dgeqrf.o dgeqrfp.o dgerfs.o \
    dgerq2.o dgerqf.o dgesc2.o dgesdd.o dgesv.o  dgesvd.o dgesvdx.o dgesvx.o \
-   dgesvdr.o \
+   dgesvdm.o dgesvdr.o \
    dgetc2.o dgetf2.o dgetrf.o dgetri.o \
    dgetrs.o dggbak.o dggbal.o dgges.o  dgges3.o dggesx.o \
    dggev.o  dggev3.o dggevx.o \

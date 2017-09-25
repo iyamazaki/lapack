@@ -214,7 +214,7 @@
 *> \ingroup doubleOTHEReigen
 *
 *  =====================================================================   
-      SUBROUTINE DBDSVDR( UPLO, JOBZ, RANGE, N, D, E, VL, VU, IL, IU, 
+      SUBROUTINE DBDSVDM( UPLO, JOBZ, RANGE, N, D, E, VL, VU, IL, IU, 
      $                    NS, S, Z, LDZ, WORK, LWORK, IWORK, LIWORK, 
      $                    INFO)
 *
@@ -254,7 +254,7 @@
       DOUBLE PRECISION   ABSTOL, EPS, EMIN, MU, NRMU, NRMV, ORTOL, SMAX,
      $                   SMIN, SQRT2, THRESH, TOL, ULP, 
      $                   VLTGK, VUTGK, ZJTJI
-!      LOGICAL            TRYRAC
+      LOGICAL            TRYRAC
 *     ..
 *     .. External Functions ..
       LOGICAL            LSAME
@@ -401,8 +401,6 @@
 *        of the active submatrix.
 *
          RNGVX = 'I'
-         ILTGK = IL
-         IUTGK = IU 
          CALL DLASET( 'F', N*2, N+1, ZERO, ZERO, Z, LDZ )
       ELSE IF( VALSV ) THEN
 *
@@ -428,10 +426,56 @@
          END IF
       ELSE IF( INDSV ) THEN
 *
+*        Find the IL-th through the IU-th singular values. We aim 
+*        at -s (see leading comments) and indices are mapped into 
+*        values, therefore mimicking DSTEBZ, where
+*
+*        GL = GL - FUDGE*TNORM*ULP*N - FUDGE*TWO*PIVMIN
+*        GU = GU + FUDGE*TNORM*ULP*N + FUDGE*PIVMIN
+*
          ILTGK = IL
          IUTGK = IU 
-         RNGVX = 'I'
-         CALL DLASET( 'F', N*2, N+1, ZERO, ZERO, Z, LDZ )
+         RNGVX = 'V'
+         WORK( IDTGK:IDTGK+2*N-1 ) = ZERO
+         CALL DCOPY( N, D, 1, WORK( IETGK ), 2 )
+         CALL DCOPY( N-1, E, 1, WORK( IETGK+1 ), 2 )
+         TRYRAC = .TRUE.
+         CALL DSTEMR( 'N', 'I', N*2, WORK( IDTGK ), WORK( IETGK ),
+     $                VLTGK, VLTGK, ILTGK, ILTGK, NS,
+     $                S, Z, LDZ,
+     $                NTGK, IWORK( IIFAIL ), TRYRAC,
+     $                WORK( ITEMP ), LWORK-ITEMP+1,
+     $                IWORK( IIWORK ), LIWORK-IIWORK+1,
+     $                INFO )
+         IF (INFO.NE.0 .OR. NS.NE.1) THEN
+           WRITE(*,*) 'DSTEMR-1',INFO,NX
+         END IF
+*
+         VLTGK = S( 1 ) - FUDGE*SMAX*ULP*N
+         WORK( IDTGK:IDTGK+2*N-1 ) = ZERO
+         CALL DCOPY( N, D, 1, WORK( IETGK ), 2 )
+         CALL DCOPY( N-1, E, 1, WORK( IETGK+1 ), 2 )
+         TRYRAC = .TRUE.
+         CALL DSTEMR( 'N', 'I', N*2, WORK( IDTGK ), WORK( IETGK ),
+     $                VUTGK, VUTGK, IUTGK, IUTGK, NS,
+     $                S, Z, LDZ,
+     $                NTGK, IWORK( IIWORK ), TRYRAC,
+     $                WORK( ITEMP ), LWORK-ITEMP+1,
+     $                IWORK( IIFAIL ), LIWORK-IIFAIL+1,
+     $                INFO )
+         IF (INFO.NE.0 .OR. NS.NE.1) THEN
+           WRITE(*,*) 'DSTEMR-2',INFO,NX
+         END IF
+*
+         VUTGK = S( 1 ) + FUDGE*SMAX*ULP*N
+         VUTGK = MIN( VUTGK, ZERO )
+*
+*        If VLTGK=VUTGK, DSTEVX returns an error message,
+*        so if needed we change VUTGK slightly.    
+*
+         IF( VLTGK.EQ.VUTGK ) VLTGK = VLTGK - TOL
+*
+         CALL DLASET( 'F', N*2, IU-IL+1, ZERO, ZERO, Z, LDZ )
       END IF             
 *
 *     Initialize variables and pointers for S, Z, and WORK.
@@ -543,21 +587,17 @@ c            WRITE(*,*) 'IEPTR: ',IEPTR,':',IDBEG,',',IDEND
 *                 if RANGE='V' (VALSV) then RNGVX = 'V'
 *                 if RANGE='I' (INDSV) then RNGVX = 'V'
 *
-c                  ILTGK = 1
-c                  IUTGK = NTGK / 2 
-c                  IF( ALLSV .OR. VUTGK.EQ.ZERO ) THEN
-c                     IF( SVEQ0 .OR. 
-c     $                   SMIN.LT.EPS .OR. 
-c     $                   MOD(NTGK,2).GT.0 ) THEN
+                  ILTGK = 1
+                  IUTGK = NTGK / 2 
+                  IF( ALLSV .OR. VUTGK.EQ.ZERO ) THEN
+                     IF( SVEQ0 .OR. 
+     $                   SMIN.LT.EPS .OR. 
+     $                   MOD(NTGK,2).GT.0 ) THEN
 *                        Special case: eigenvalue equal to zero or very
 *                        small, additional eigenvector is needed.
-c                         IUTGK = IUTGK + 1
-c                     END IF    
-c                  END IF
-*
-*                 Workspace needed by DSTEVX:   
-*                 WORK( ITEMP: ): 2*5*NTGK 
-*                 IWORK( 1: ): 2*6*NTGK
+                         IUTGK = IUTGK + 1
+                     END IF    
+                  END IF
 *
 c                  WRITE(*,*) 'IEPTR: ',IEPTR,' IDPTR:',IDPTR
 c                  WRITE(*,*) 'DSTEVX 3 -> DSTEXR: JOBZ=',JOBZ,
@@ -567,19 +607,19 @@ c                  WRITE(*,*) ' IROWZ:',IROWZ,' ICOLZ:',ICOLZ
 c                  WRITE(*,*) ' VL:',VLTGK,',VU:',VUTGK
 c                  WRITE(*,*) ' ILTGK:',ILTGK,' IUTGK:',IUTGK
 c                  WRITE(*,*) ' LWORK:',LWORK,' LIWORK:',LIWORK
-                  CALL DSTEXR( NTGK, WORK( IDTGK+ISPLT-1 ), 
+                  TRYRAC = .TRUE.
+                  CALL DSTEMR( JOBZ, RNGVX, NTGK, WORK( IDTGK+ISPLT-1 ),
      $                         WORK( IETGK+ISPLT-1 ),
-     $                         ILTGK, IUTGK,
+     $                         VLTGK, VUTGK, ILTGK, IUTGK, NSL,
      $                         S( ISBEG ), Z( IROWZ,ICOLZ ), LDZ,
-     $                         IWORK( IIFAIL ),
+     $                         NTGK, IWORK( IIFAIL ), TRYRAC,
      $                         WORK( ITEMP ), LWORK-ITEMP+1,
      $                         IWORK( IIWORK ), LIWORK-IIWORK+1,
      $                         INFO )
-                  NSL = IUTGK-ILTGK+1
-c                  WRITE(*,*) S(ILTGK:IUTGK)
+!                  WRITE(*,*) S(1:2*N)
                   IF( INFO.NE.0 ) THEN
 *                    Exit with the error code from DSTEVX.
-                     WRITE(*,*) 'DSTEXR INFO=',INFO
+                     WRITE(*,*) 'DSTEMR INFO=',INFO
                      RETURN
                   END IF
                   EMIN = ABS( MAXVAL( S( ISBEG:ISBEG+NSL-1 ) ) )
