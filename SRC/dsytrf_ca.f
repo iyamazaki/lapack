@@ -18,15 +18,16 @@
 *  Definition:
 *  ===========
 *
-*       SUBROUTINE DSYTRF_CA( UPLO, N, A, LDA, IPIV, WORK, LWORK, INFO )
+*      SUBROUTINE DSYTRF_CA( UPLO, FLAG, N, NB, A, LDA, TB, LDTB, WORK,
+*                            LWORK, IPIV, IPIV2, INFO)
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
 *       INTEGER            N, LDA, LWORK, INFO
 *       ..
 *       .. Array Arguments ..
-*       INTEGER            IPIV( * )
-*       DOUBLE PRECISION   A( LDA, * ), WORK( * )
+*       INTEGER            IPIV( * ), IPIV2( * )
+*       DOUBLE PRECISION   A( LDA, * ), TB( LDTB, * ), WORK( * )
 *       ..
 *
 *> \par Purpose:
@@ -91,7 +92,8 @@
 *>
 *> \param[in] LDTB
 *> \verbatim
-*>          The leading dimension of the array TB. LDTB >= 3*NB+1.
+*>          The leading dimension of the array TB. LDTB >= 4, used to
+*>          set up NB such that LDTB >= 3*NB+1.
 *> \endverbatim
 *>
 *> \param[out] WORK
@@ -101,7 +103,8 @@
 *>
 *> \param[in] LWORK
 *> \verbatim
-*>          The size of WORK. LWORK >= N*NB.
+*>          The size of WORK. LWORK >= N, used to set up NB such that
+*>          LWORK >= N*NB.
 *> \endverbatim
 *>
 *> \param[out] IPIV
@@ -125,7 +128,8 @@
 *>          INFO is INTEGER
 *>          = 0:  successful exit
 *>          < 0:  if INFO = -i, the i-th argument had an illegal value.
-*>          > 0:  if INFO = i, A(i,i) or T(i,i) is exactly zero.  
+*>          > 0:  if INFO = i <= N, panel factorization failed on i-th column
+*>             :  if INFO = i >  N, band LU factorization failed on (N-i)-th column
 *> \endverbatim
 *
 *  Authors:
@@ -184,13 +188,6 @@
 *     ..
 *     .. Executable Statements ..
 *
-*     Determine the block size
-*
-c      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
-c      NB = 5
-      NT = (N+NB-1)/NB
-      TD = 2*NB
-*
 *     Test the input parameters.
 *
       INFO = 0
@@ -201,6 +198,10 @@ c      NB = 5
          INFO = -2
       ELSE IF( LDA.LT.MAX( 1, N ) ) THEN
          INFO = -4
+      ELSE IF ( LDTB .LT. 3*NB+1 ) THEN
+         INFO = -7
+      ELSE IF ( LWORK .LT. (N*NB) ) THEN
+         INFO = -9
       END IF
 *
       IF( INFO.NE.0 ) THEN
@@ -213,7 +214,22 @@ c      NB = 5
       IF ( N.EQ.0 ) THEN
           RETURN
       ENDIF
+*
+*     Determine the block size
+*
+c      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
+c      IF ( LWORK .LT. (N*NB) ) THEN
+c          NB = LWORK / N
+c      END IF
+c      IF ( LDTB .LT. 3*NB+1 ) THEN
+c          NB = (LDTB-1) / 3
+c      END IF
+c      NT = (N+NB-1)/NB
+      TD = 2*NB
       KB = MIN(NB, N)
+*
+*     Initialize the first block column
+*
       DO J = 1, KB
          IPIV( J ) = J
       END DO
@@ -229,6 +245,165 @@ c      NB = 5
 *        Factorize A as L*D*L**T using the upper triangle of A
 *        .....................................................
 *
+         DO J = 0, NT-1
+*         
+*           Generate Jth column of W and H
+*
+            KB = MIN(NB, N-J*NB)
+            DO I = 1, J-1
+               IF( I.EQ.1 ) THEN
+*                  H(I,J) = T(I,I)*L(J,I)' + T(I+1,I)'*L(J,I+1)'
+                   CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                          NB, KB, 2*NB,
+     $                          ONE, TB( TD+1, I*NB+1 ), LDTB-1,
+     $                               A( J*NB+1, (I-1)*NB+1 ), LDA,
+     $                          ZERO, WORK( I*NB+1 ), N )
+               ELSE IF( I .EQ. J-1) THEN
+*                 H(I,J) = T(I,I-1)*L(J,I-1)' + T(I,I)*L(J,I)' + T(I,I+1)*L(J,I+1)'
+                  CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                         NB, KB, 2*NB+KB,
+     $                         ONE,  TB( TD+NB+1, (I-1)*NB+1 ), LDTB-1,
+     $                               A( J*NB+1, (I-2)*NB+1 ), LDA,
+     $                         ZERO, WORK( I*NB+1 ), N )
+               ELSE
+*                 H(I,J) = T(I,I-1)*L(J,I-1)' + T(I,I)*L(J,I)' + T(I,I+1)*L(J,I+1)'
+                  CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                         NB, KB, 3*NB,
+     $                         ONE,  TB( TD+NB+1, (I-1)*NB+1 ), LDTB-1,
+     $                               A( J*NB+1, (I-2)*NB+1 ), LDA,
+     $                         ZERO, WORK( I*NB+1 ), N )
+               END IF
+            END DO
+*         
+*           Compute T(J,J)
+*     
+            CALL DLACPY( 'Full', KB, KB, A( J*NB+1, J*NB+1 ), LDA,
+     $                   TB( TD+1, J*NB+1 ), LDTB-1 ) 
+            IF( J.GT.1 ) THEN
+*              T(J,J) = L(J,1:J)*H(1:J)             
+               CALL DGEMM( 'NoTranspose', 'NoTranspose',
+     $                      KB, KB, (J-1)*NB,
+     $                     -ONE, A( J*NB+1, 1 ), LDA,
+     $                           WORK( NB+1 ), N,
+     $                      ONE, TB( TD+1, J*NB+1 ), LDTB-1 )
+*              T(J,J) += L(J,J)*T(J,J-1)*L(J,J-1)'
+               CALL DGEMM( 'NoTranspose', 'NoTranspose',
+     $                      KB, NB, KB,
+     $                      ONE,  A( J*NB+1, (J-1)*NB+1 ), LDA,
+     $                            TB( TD+NB+1, (J-1)*NB+1 ), LDTB-1,
+     $                      ZERO, WORK( 1 ), N )
+               CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                      KB, KB, NB,
+     $                     -ONE, WORK( 1 ), N,
+     $                           A( J*NB+1, (J-2)*NB+1 ), LDA,
+     $                      ONE, TB( TD+1, J*NB+1 ), LDTB-1 )
+            END IF
+            IF( J.GT.0 ) THEN 
+               CALL DSYGST( 1, 'Lower', KB, TB( TD+1, J*NB+1 ), LDTB-1, 
+     $                      A( J*NB+1, (J-1)*NB+1 ), LDA, IINFO )
+            END IF
+*
+*           Expand T(J,J) into full format
+*
+            DO I = 1, KB
+               DO K = I+1, KB
+                  TB( TD-(K-(I+1)), J*NB+K ) = TB( TD+(K-I)+1, J*NB+I )
+               END DO
+            END DO
+
+            IF( J.LT.NT-1 ) THEN
+               IF( J.GT.0 ) THEN
+*
+*                 Compute H(J,J)
+*
+                  IF( J.EQ.1 ) THEN
+                     CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                            KB, KB, KB,
+     $                            ONE,  TB( TD+1, J*NB+1 ), LDTB-1,
+     $                                  A( J*NB+1, (J-1)*NB+1 ), LDA,
+     $                            ZERO, WORK( J*NB+1 ), N )
+                  ELSE
+                     CALL DGEMM( 'NoTranspose', 'Transpose',
+     $                           KB, KB, NB+KB,
+     $                           ONE, TB( TD+NB+1, (J-1)*NB+1 ), LDTB-1,
+     $                                 A( J*NB+1, (J-2)*NB+1 ), LDA,
+     $                           ZERO, WORK( J*NB+1 ), N )
+                  END IF
+*
+*                 Update with the previous column
+*
+                  CALL DGEMM( 'NoTranspose', 'NoTranspose',
+     $                         N-(J+1)*NB, NB, J*NB,
+     $                        -ONE, A( (J+1)*NB+1, 1 ), LDA,
+     $                              WORK( NB+1 ), N,
+     $                         ONE, A( (J+1)*NB+1, J*NB+1 ), LDA )
+               END IF
+               CALL DGETRF( N-(J+1)*NB, NB, 
+     $                      A( (J+1)*NB+1, J*NB+1 ), LDA,
+     $                      IPIV( (J+1)*NB+1 ), IINFO )
+               IF (IINFO.NE.0 .AND. INFO.EQ.0) THEN
+                  INFO = IINFO+NB
+               END IF
+*         
+*              Compute T(J+1, J)     
+*     
+               KB = MIN(NB, N-(J+1)*NB)
+               CALL DLACPY( 'Upper', KB, NB,
+     $                      A( (J+1)*NB+1, J*NB+1 ), LDA,
+     $                      TB( TD+NB+1, J*NB+1 ), LDTB-1 )
+               IF( J.GT.0 ) THEN 
+                  CALL DTRSM( 'R', 'L', 'T', 'U', KB, NB, ONE,
+     $                        A( J*NB+1, (J-1)*NB+1 ), LDA,
+     $                        TB( TD+NB+1, J*NB+1 ), LDTB-1 )
+               END IF
+*
+*              Copy T(J+1,J) into T(J, J+1)
+*
+               DO K = 1, NB
+                  DO I = 1, MIN(K, KB)
+                     TB( TD-NB+K-I+1, J*NB+NB+I ) =
+     $                  TB( TD+NB+I-K+1, J*NB+K )
+                  END DO
+               END DO
+               CALL DLASET( 'Upper', KB, NB, ZERO, ONE, 
+     $                      A( (J+1)*NB+1, J*NB+1), LDA )
+*              
+*              Apply pivots to trailing submatrix of A
+*     
+               DO K = 1, KB
+*                 > Adjust ipiv               
+                  IPIV( (J+1)*NB+K ) = IPIV( (J+1)*NB+K ) + (J+1)*NB
+*                  
+                  I1 = (J+1)*NB+K
+                  I2 = IPIV( (J+1)*NB+K )
+                  IF( I1.NE.I2 ) THEN 
+*                    > Apply pivots to previous columns of L
+                     CALL DSWAP( K-1, A( I1, (J+1)*NB+1 ), LDA, 
+     $                                A( I2, (J+1)*NB+1 ), LDA )
+*                    > Swap A(I1+1:M, I1) with A(I2, I1+1:M)               
+                     CALL DSWAP( I2-I1-1, A( I1+1, I1 ), 1,
+     $                                    A( I2, I1+1 ), LDA )
+*                    > Swap A(I2+1:M, I1) with A(I2+1:M, I2)
+                     CALL DSWAP( N-I2, A( I2+1, I1 ), 1,
+     $                                 A( I2+1, I2 ), 1 ) 
+*                    > Swap A(I1, I1) with A(I2, I2)
+                     PIV = A( I1, I1 )
+                     A( I1, I1 ) = A( I2, I2 )
+                     A( I2, I2 ) = PIV
+*                    > Apply pivots to previous columns of L
+                     IF( J.GT.0 ) THEN
+                        CALL DSWAP( J*NB, A( I1, 1 ), LDA,
+     $                                    A( I2, 1 ), LDA )
+                     END IF
+                  ENDIF   
+               END DO   
+*         
+*              Apply pivots to previous columns of L
+*         
+c               CALL DLASWP( J*NB, A( 1, 1 ), LDA, 
+c     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
+            END IF
+         END DO
       ELSE
 *
 *        .....................................................
@@ -333,7 +508,6 @@ c      NB = 5
      $                      IPIV( (J+1)*NB+1 ), IINFO )
                IF (IINFO.NE.0 .AND. INFO.EQ.0) THEN
                   INFO = IINFO+NB
-c                  WRITE(*,*) 'DGETRF returned INFO=',INFO,' at J=',J
                END IF
 *         
 *              Compute T(J+1, J)     
