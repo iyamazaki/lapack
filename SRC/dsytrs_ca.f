@@ -192,6 +192,33 @@
 *
 *        Solve A*X = B, where A = U*T*U**T.
 *
+*        Pivot, P**T * B
+*
+         CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
+*
+*        Compute (U**T \P**T * B) -> B    [ (U**T \P**T * B) ]
+*
+         IF( N.GT.NB ) THEN
+            CALL DTRSM( 'L', 'U', 'T', 'U', N-NB, NRHS, ONE, A(1, NB+1),
+     $                 LDA, B(NB+1, 1), LDB)
+         END IF
+*
+*        Compute T \ B -> B   [ T \ (U**T \P**T * B) ]
+*
+         CALL DGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
+     $               INFO)
+*
+*        Compute (U \ B) -> B   [ U \ (T \ (U**T \P**T * B) ) ]
+*
+         IF( N.GT.NB ) THEN
+            CALL DTRSM( 'L', 'U', 'N', 'U', N-NB, NRHS, ONE, A(1, NB+1),
+     $                  LDA, B(NB+1, 1), LDB)
+         END IF
+*
+*        Pivot, P * B  [ P * (U \ (T \ (U**T \P**T * B) )) ]
+*
+         CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
+*
       ELSE
 *
 *        Solve A*X = B, where A = L*T*L**T.
@@ -202,8 +229,10 @@
 *
 *        Compute (L \P**T * B) -> B    [ (L \P**T * B) ]
 *
-         CALL DTRSM( 'L', 'L', 'N', 'U', N, NRHS, ONE, A, LDA,
-     $               B, LDB)
+         IF( N.GT.NB ) THEN
+            CALL DTRSM( 'L', 'L', 'N', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
+     $                 LDA, B(NB+1, 1), LDB)
+         END IF
 *
 *        Compute T \ B -> B   [ T \ (L \P**T * B) ]
 *
@@ -212,8 +241,10 @@
 *
 *        Compute (L**T \ B) -> B   [ L**T \ (T \ (L \P**T * B) ) ]
 *
-         CALL DTRSM( 'L', 'L', 'T', 'U', N, NRHS, ONE, A, LDA,
-     $              B, LDB)
+         IF( N.GT.NB ) THEN
+            CALL DTRSM( 'L', 'L', 'T', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
+     $                  LDA, B(NB+1, 1), LDB)
+         END IF
 *
 *        Pivot, P * B  [ P * (L**T \ (T \ (L \P**T * B) )) ]
 *
