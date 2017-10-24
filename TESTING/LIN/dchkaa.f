@@ -149,7 +149,7 @@
      $                   RANKVAL( MAXIN ), PIV( NMAX )
       DOUBLE PRECISION   A( ( KDMAX+1 )*NMAX, 7 ), B( NMAX*MAXRHS, 4 ),
      $                   E( NMAX ), RWORK( 5*NMAX+2*MAXRHS ),
-     $                   S( 2*NMAX ), WORK( NMAX, NMAX+MAXRHS+30 )
+     $                   S( 2*NMAX ), WORK( NMAX, 3*NMAX+MAXRHS+30 )
 *     ..
 *     .. External Functions ..
       LOGICAL            LSAME, LSAMEN
@@ -723,6 +723,24 @@
             WRITE( NOUT, FMT = 9988 )PATH
          END IF
 *
+*
+      ELSE IF( LSAMEN( 2, C2, 'SC' ) ) THEN
+*
+*        SA:  symmetric indefinite matrices,
+*             with partial (Aasen's) pivoting algorithm
+*
+         NTYPES = 10
+         CALL ALAREQ( PATH, NMATS, DOTYPE, NTYPES, NIN, NOUT )
+*
+         IF( TSTCHK ) THEN
+            CALL DCHKSY_CA( DOTYPE, NN, NVAL, NNB2, NBVAL2, NNS,
+     $                         NSVAL, THRESH, TSTERR, LDA,
+     $                         A( 1, 1 ), A( 1, 2 ), A( 1, 3 ),
+     $                         B( 1, 1 ), B( 1, 2 ), B( 1, 3 ),
+     $                         WORK, RWORK, IWORK, NOUT )
+         ELSE
+            WRITE( NOUT, FMT = 9989 )PATH
+         END IF
 *
       ELSE IF( LSAMEN( 2, C2, 'SP' ) ) THEN
 *
