@@ -1,4 +1,4 @@
-*> \brief \b DSYTRS_CA
+*> \brief \b DSYTRS_AASEN_2STAGE
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -6,24 +6,24 @@
 *            http://www.netlib.org/lapack/explore-html/
 *
 *> \htmlonly
-*> Download DSYTRS_CA + dependencies
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrs_ca.f">
+*> Download DSYTRS_AASEN_2STAGE + dependencies
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrs_aasen_2stage.f">
 *> [TGZ]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrs_ca.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrs_aasen_2stage.f">
 *> [ZIP]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrs_ca.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrs_aasen_2stage.f">
 *> [TXT]</a>
 *> \endhtmlonly
 *
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE DSYTRS_CA( UPLO, N, NB, NRHS, A, LDA, TB, LDTB, IPIV, 
-*                            IPIV2, B, LDB, INFO )
+*      SUBROUTINE DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LDTB, IPIV, 
+*                                      IPIV2, B, LDB, INFO )
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
-*       INTEGER            N, NB, NRHS, LDA, LDTB, LDB, INFO
+*       INTEGER            N, NRHS, LDA, LDTB, LDB, INFO
 *       ..
 *       .. Array Arguments ..
 *       INTEGER            IPIV( * ), IPIV2( * )
@@ -35,9 +35,9 @@
 *>
 *> \verbatim
 *>
-*> DSYTRS_CA solves a system of linear equations A*X = B with a real
+*> DSYTRS_AASEN_2STAGE solves a system of linear equations A*X = B with a real
 *> symmetric matrix A using the factorization A = U*T*U**T or
-*> A = L*T*L**T computed by DSYTRF_CA.
+*> A = L*T*L**T computed by DSYTRF_AASEN_2STAGE.
 *> \endverbatim
 *
 *  Arguments:
@@ -58,12 +58,6 @@
 *>          The order of the matrix A.  N >= 0.
 *> \endverbatim
 *>
-*> \param[in] NB
-*> \verbatim
-*>          NB is INTEGER
-*>          The bandwidth of the matrix T.  NB > 0.
-*> \endverbatim
-*>
 *> \param[in] NRHS
 *> \verbatim
 *>          NRHS is INTEGER
@@ -74,7 +68,7 @@
 *> \param[in] A
 *> \verbatim
 *>          A is DOUBLE PRECISION array, dimension (LDA,N)
-*>          Details of factors computed by DSYTRF_CA.
+*>          Details of factors computed by DSYTRF_AASEN_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] LDA
@@ -86,24 +80,26 @@
 *> \param[out] TB
 *> \verbatim
 *>          TB is DOUBLE PRECISION array, dimension (LDTB, N)
-*>          Details of factors computed by DSYTRF_CA.
+*>          Details of factors computed by DSYTRF_AASEN_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] LDTB
 *> \verbatim
-*>          The leading dimension of the array TB. LDTB >= 3*NB+1.
+*>          The leading dimension of the array TB. LDTB >= 4.
 *> \endverbatim
 *>
 *> \param[in] IPIV
 *> \verbatim
 *>          IPIV is INTEGER array, dimension (N)
-*>          Details of the interchanges as computed by DSYTRF_CA.
+*>          Details of the interchanges as computed by
+*>          DSYTRF_AASEN_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] IPIV2
 *> \verbatim
 *>          IPIV2 is INTEGER array, dimension (N)
-*>          Details of the interchanges as computed by DSYTRF_CA.
+*>          Details of the interchanges as computed by
+*>          DSYTRF_AASEN_2STAGE.
 *> \endverbatim
 *>
 *> \param[in,out] B
@@ -139,8 +135,8 @@
 *> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRS_CA( UPLO, N, NB, NRHS, A, LDA, TB, LDTB, IPIV, 
-     $                      IPIV2, B, LDB, INFO )
+      SUBROUTINE DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LDTB,
+     $                                IPIV, IPIV2, B, LDB, INFO )
 *
 *  -- LAPACK computational routine (version 3.7.1) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -151,7 +147,7 @@
 *
 *     .. Scalar Arguments ..
       CHARACTER          UPLO
-      INTEGER            N, NB, NRHS, LDA, LDTB, LDB, INFO
+      INTEGER            N, NRHS, LDA, LDTB, LDB, INFO
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
@@ -164,6 +160,7 @@
       PARAMETER          ( ONE = 1.0D+0 )
 *     ..
 *     .. Local Scalars ..
+      INTEGER            NB
       LOGICAL            UPPER
 *     ..
 *     .. External Functions ..
@@ -192,7 +189,7 @@
          INFO = -8
       END IF
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DSYTRS_CA', -INFO )
+         CALL XERBLA( 'DSYTRS_AASEN_2STAGE', -INFO )
          RETURN
       END IF
 *
@@ -200,6 +197,10 @@
 *
       IF( N.EQ.0 .OR. NRHS.EQ.0 )
      $   RETURN
+*
+*     Read NB
+*
+      NB = TB( 1, 1 )
 *
       IF( UPPER ) THEN
 *
@@ -272,6 +273,6 @@
 *
       RETURN
 *
-*     End of DSYTRS_CA
+*     End of DSYTRS_AASEN_2STAGE
 *
       END

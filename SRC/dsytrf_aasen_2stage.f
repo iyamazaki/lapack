@@ -1,4 +1,4 @@
-*> \brief \b DSYTRF_CA
+*> \brief \b DSYTRF_AASEN_2STAGE
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -6,20 +6,20 @@
 *            http://www.netlib.org/lapack/explore-html/
 *
 *> \htmlonly
-*> Download DSYTRF_CA + dependencies
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrf_ca.f">
+*> Download DSYTRF_AASEN_2STAGE + dependencies
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrf_aasen_2stage.f">
 *> [TGZ]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrf_ca.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrf_aasen_2stage.f">
 *> [ZIP]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrf_ca.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrf_aasen_2stage.f">
 *> [TXT]</a>
 *> \endhtmlonly
 *
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE DSYTRF_CA( UPLO, N, NB, A, LDA, TB, LDTB, WORK, LWORK,
-*                            IPIV, IPIV2, INFO)
+*      SUBROUTINE DSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LDTB, WORK, LWORK,
+*                                      IPIV, IPIV2, INFO)
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
@@ -35,14 +35,14 @@
 *>
 *> \verbatim
 *>
-*> DSYTRF_CA computes the factorization of a real symmetric matrix A
+*> DSYTRF_AASEN_2STAGE computes the factorization of a real symmetric matrix A
 *> using the Aasen's algorithm.  The form of the factorization is
 *>
 *>    A = U*T*U**T  or  A = L*T*L**T
 *>
 *> where U (or L) is a product of permutation and unit upper (lower)
 *> triangular matrices, and T is a symmetric band matrix with the
-*> band width of NB.
+*> band width of NB (internally selected).
 *>
 *> This is the blocked version of the algorithm, calling Level 3 BLAS.
 *> \endverbatim
@@ -61,12 +61,6 @@
 *> \verbatim
 *>          N is INTEGER
 *>          The order of the matrix A.  N >= 0.
-*> \endverbatim
-*>
-*> \param[in] NB
-*> \verbatim
-*>          NB is INTEGER
-*>          The bandwidth of the matrix T.  NB > 0.
 *> \endverbatim
 *>
 *> \param[in,out] A
@@ -98,7 +92,8 @@
 *>
 *> \param[in] LDTB
 *> \verbatim
-*>          The leading dimension of the array TB. LDTB >= 3*NB+1.
+*>          The leading dimension of the array TB. LDTB >= 4, internally
+*>          used to select NB such that LDTB >= 3*NB+1.
 *> \endverbatim
 *>
 *> \param[out] WORK
@@ -108,7 +103,8 @@
 *>
 *> \param[in] LWORK
 *> \verbatim
-*>          The size of WORK. LWORK >= N*NB.
+*>          The size of WORK. LWORK >= N, internally used to select NB
+*>          such that LWORK >= N*NB.
 *> \endverbatim
 *>
 *> \param[out] IPIV
@@ -148,8 +144,8 @@
 *> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRF_CA( UPLO, FLAG, N, NB, A, LDA, TB, LDTB, WORK,
-     $                      LWORK, IPIV, IPIV2, INFO)
+      SUBROUTINE DSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LDTB, WORK,
+     $                                LWORK, IPIV, IPIV2, INFO )
 *
 *  -- LAPACK computational routine (version 3.7.0) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -160,7 +156,7 @@
 *
 *     .. Scalar Arguments ..
       CHARACTER          UPLO
-      INTEGER            FLAG, N, LDA, LDTB, LWORK, INFO
+      INTEGER            N, LDA, LDTB, LWORK, INFO
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
@@ -201,22 +197,32 @@
          INFO = -2
       ELSE IF( LDA.LT.MAX( 1, N ) ) THEN
          INFO = -5
-      ELSE IF ( LDTB .LT. 3*NB+1 ) THEN
+      ELSE IF ( LDTB .LT. 4 ) THEN
          INFO = -7
-      ELSE IF ( LWORK .LT. (N*NB) ) THEN
+      ELSE IF ( LWORK .LT. N ) THEN
          INFO = -9
       END IF
 *
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DSYTRF_CA', -INFO )
+         CALL XERBLA( 'DSYTRF_AASEN_2STAGE', -INFO )
          RETURN
       END IF
 *
 *     Quick return
 *
       IF ( N.EQ.0 ) THEN
-          RETURN
+         RETURN
       ENDIF
+*
+*     Determine the number of the block size
+*
+      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
+      IF( LDTB .LT. 3*NB+1 ) THEN
+         NB = (LDTB-1)/3
+      END IF
+      IF( LWORK .LT. NB*N ) THEN
+         NB = LWORK/N
+      END IF
 *
 *     Determine the number of the block columns
 *
@@ -231,6 +237,10 @@
       END DO
       CALL DLASET( 'Full', LDTB, N, ZERO, ZERO, 
      $             TB, LDTB )
+*
+*     Save NB
+*
+      TB( 1, 1 ) = NB
 *
       IF( UPPER ) THEN
 *
@@ -587,10 +597,8 @@ c     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
       END IF
 *
 *     Factor the band matrix
-      IF (FLAG.EQ.1) THEN
-         CALL DGBTRF( N, N, NB, NB, TB, LDTB, IPIV2, INFO )
-      END IF
+      CALL DGBTRF( N, N, NB, NB, TB, LDTB, IPIV2, INFO )
 *
-*     End of DSYTRF_CA
+*     End of DSYTRF_AASEN_2STAGE
 *
       END

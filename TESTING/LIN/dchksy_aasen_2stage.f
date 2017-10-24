@@ -1,4 +1,4 @@
-*> \brief \b DCHKSY_CA
+*> \brief \b DCHKSY_AASEN_2STAGE
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -8,9 +8,10 @@
 *  Definition:
 *  ===========
 *
-*       SUBROUTINE DCHKSY_CA( DOTYPE, NN, NVAL, NNB, NBVAL, NNS, NSVAL,
-*                             THRESH, TSTERR, NMAX, A, AFAC, AINV, B, X,
-*                             XACT, WORK, RWORK, IWORK, NOUT )
+*       SUBROUTINE DCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, 
+*                             NNS, NSVAL, THRESH, TSTERR, NMAX, A,
+*                             AFAC, AINV, B, X, XACT, WORK, RWORK,
+*                             IWORK, NOUT )
 *
 *       .. Scalar Arguments ..
 *       LOGICAL            TSTERR
@@ -30,7 +31,7 @@
 *>
 *> \verbatim
 *>
-*> DCHKSY_CA tests DSYTRF_CA, -TRS_CA.
+*> DCHKSY_AASEN_2STAGE tests DSYTRF_AASEN_2STAGE, -TRS_AASEN_2STAGE.
 *> \endverbatim
 *
 *  Arguments:
@@ -168,9 +169,9 @@
 *> \ingroup double_lin
 *
 *  =====================================================================
-      SUBROUTINE DCHKSY_CA( DOTYPE, NN, NVAL, NNB, NBVAL, NNS, NSVAL,
-     $                      THRESH, TSTERR, NMAX, A, AFAC, AINV, B,
-     $                      X, XACT, WORK, RWORK, IWORK, NOUT )
+      SUBROUTINE DCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, NNS,
+     $                      NSVAL, THRESH, TSTERR, NMAX, A, AFAC, AINV,
+     $                      B, X, XACT, WORK, RWORK, IWORK, NOUT )
 *
 *  -- LAPACK test routine (version 3.7.1) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -217,8 +218,9 @@
 *     ..
 *     .. External Subroutines ..
       EXTERNAL           ALAERH, ALAHD, ALASUM, DERRSY, DLACPY, DLARHS,
-     $                   DLATB4, DLATMS, DPOT02, DSYT01_CA, DSYTRF_CA,
-     $                   DSYTRS_CA, XLAENV
+     $                   DLATB4, DLATMS, DPOT02, DSYT01, 
+     $                   DSYTRF_AASEN_2STAGE, DSYTRS_AASEN_2STAGE,
+     $                   XLAENV
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MAX, MIN
@@ -424,13 +426,13 @@
 *                 the block structure of D. AINV is a work array for
 *                 block factorization, LWORK is the length of AINV.
 *
-                  SRNAMT = 'DSYTRF_CA'
-                  LWORK = MAX( 1, N*NB + N )
-                  CALL DSYTRF_CA( UPLO, 1, N, NB, AFAC, LDA, 
-     $                            AINV, 3*NB+1, 
-     $                            WORK, MIN(N*NB, 3*NMAX*NMAX),
-     $                            IWORK, IWORK( 1+N ),
-     $                            INFO )
+                  SRNAMT = 'DSYTRF_AASEN_2STAGE'
+                  LWORK = MIN(N*NB, 3*NMAX*NMAX)
+                  CALL DSYTRF_AASEN_2STAGE( UPLO, N, AFAC, LDA, 
+     $                                      AINV, 3*NB+1, 
+     $                                      WORK, LWORK,
+     $                                      IWORK, IWORK( 1+N ),
+     $                                      INFO )
 *
 *                 Adjust the expected value of INFO to account for
 *                 pivoting.
@@ -455,9 +457,9 @@
 *                 Check error code from DSYTRF and handle error.
 *
                   IF( INFO.NE.K ) THEN
-                     CALL ALAERH( PATH, 'DSYTRF_CA', INFO, K, UPLO,
-     $                            N, N, -1, -1, NB, IMAT, NFAIL, NERRS,
-     $                            NOUT )
+                     CALL ALAERH( PATH, 'DSYTRF_AASEN_2STAGE', INFO, K,
+     $                            UPLO, N, N, -1, -1, NB, IMAT, NFAIL,
+     $                            NERRS, NOUT )
                   END IF
 *
 *+    TEST 1
@@ -506,9 +508,9 @@ c                  NT = 1
      $                            B, LDA, ISEED, INFO )
                      CALL DLACPY( 'Full', N, NRHS, B, LDA, X, LDA )
 *
-                     SRNAMT = 'DSYTRS_CA'
+                     SRNAMT = 'DSYTRS_AASEN_2STAGE'
                      LWORK = MAX( 1, 3*N-2 )
-                     CALL DSYTRS_CA( UPLO, N, NB, NRHS, AFAC, LDA,
+                     CALL DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, AFAC, LDA,
      $                               AINV, 3*NB+1, IWORK, IWORK( 1+N ), 
      $                               X, LDA, INFO )
 *
@@ -516,9 +518,9 @@ c                  NT = 1
 *
                      IF( INFO.NE.0 ) THEN
                         IF( IZERO.EQ.0 ) THEN
-                           CALL ALAERH( PATH, 'DSYTRS_CA', INFO, 0,
-     $                                  UPLO, N, N, -1, -1, NRHS, IMAT,
-     $                                  NFAIL, NERRS, NOUT )
+                           CALL ALAERH( PATH, 'DSYTRS_AASEN_2STAGE',
+     $                                  INFO, 0, UPLO, N, N, -1, -1,
+     $                                  NRHS, IMAT, NFAIL, NERRS, NOUT )
                         END IF
                      ELSE
                         CALL DLACPY( 'Full', N, NRHS, B, LDA, WORK, LDA
@@ -566,6 +568,6 @@ c                  NT = 1
      $      I6 )
       RETURN
 *
-*     End of DCHKSY_CA
+*     End of DCHKSY_AASEN_2STAGE
 *
       END
