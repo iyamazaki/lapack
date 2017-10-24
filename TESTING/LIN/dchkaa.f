@@ -733,8 +733,8 @@
          CALL ALAREQ( PATH, NMATS, DOTYPE, NTYPES, NIN, NOUT )
 *
          IF( TSTCHK ) THEN
-            CALL DCHKSY_CA( DOTYPE, NN, NVAL, NNB2, NBVAL2, NNS,
-     $                         NSVAL, THRESH, TSTERR, LDA,
+            CALL DCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB2, NBVAL2,
+     $                         NNS, NSVAL, THRESH, TSTERR, LDA,
      $                         A( 1, 1 ), A( 1, 2 ), A( 1, 3 ),
      $                         B( 1, 1 ), B( 1, 2 ), B( 1, 3 ),
      $                         WORK, RWORK, IWORK, NOUT )
