@@ -94,6 +94,11 @@
 *> \verbatim
 *>          The leading dimension of the array TB. LDTB >= 4, internally
 *>          used to select NB such that LDTB >= 3*NB+1.
+*>
+*>          If LDTB = -1, then a workspace query is assumed; the
+*>          routine only calculates the optimal size of LDTB, 
+*>          returns this value as the first entry of TB, and
+*>          no error message related to LDTB is issued by XERBLA.
 *> \endverbatim
 *>
 *> \param[out] WORK
@@ -105,6 +110,11 @@
 *> \verbatim
 *>          The size of WORK. LWORK >= N, internally used to select NB
 *>          such that LWORK >= N*NB.
+*>
+*>          If LWORK = -1, then a workspace query is assumed; the
+*>          routine only calculates the optimal size of the WORK array,
+*>          returns this value as the first entry of the WORK array, and
+*>          no error message related to LWORK is issued by XERBLA.
 *> \endverbatim
 *>
 *> \param[out] IPIV
@@ -160,7 +170,7 @@
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
-      DOUBLE PRECISION   A( LDA, * ), TB( LDTB, *), WORK( * )
+      DOUBLE PRECISION   A( LDA, * ), TB( LDTB, * ), WORK( * )
 *     ..
 *
 *  =====================================================================
@@ -169,7 +179,7 @@
       PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0 )
 *
 *     .. Local Scalars ..
-      LOGICAL            UPPER
+      LOGICAL            UPPER, TQUERY, WQUERY
       INTEGER            I, J, K, I1, I2, TD
       INTEGER            NB, KB, NT, IINFO
       DOUBLE PRECISION   PIV
@@ -191,20 +201,37 @@
 *
       INFO = 0
       UPPER = LSAME( UPLO, 'U' )
+      WQUERY = ( LWORK.EQ.-1 )
+      TQUERY = ( LDTB.EQ.-1 )
       IF( .NOT.UPPER .AND. .NOT.LSAME( UPLO, 'L' ) ) THEN
          INFO = -1
       ELSE IF( N.LT.0 ) THEN
          INFO = -2
       ELSE IF( LDA.LT.MAX( 1, N ) ) THEN
          INFO = -5
-      ELSE IF ( LDTB .LT. 4 ) THEN
+      ELSE IF ( LDTB .LT. 4 .AND. .NOT.TQUERY ) THEN
          INFO = -7
-      ELSE IF ( LWORK .LT. N ) THEN
+      ELSE IF ( LWORK .LT. N .AND. .NOT.WQUERY ) THEN
          INFO = -9
       END IF
 *
       IF( INFO.NE.0 ) THEN
          CALL XERBLA( 'DSYTRF_AASEN_2STAGE', -INFO )
+         RETURN
+      END IF
+*
+*     Answer the query
+*
+      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
+      IF( INFO.EQ.0 ) THEN
+         IF( TQUERY ) THEN
+            TB( 1, 1 ) = 3*NB+1
+         END IF
+         IF( WQUERY ) THEN
+            WORK( 1 ) = N*NB
+         END IF
+      END IF
+      IF( TQUERY .OR. WQUERY ) THEN
          RETURN
       END IF
 *
@@ -216,7 +243,6 @@
 *
 *     Determine the number of the block size
 *
-      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
       IF( LDTB .LT. 3*NB+1 ) THEN
          NB = (LDTB-1)/3
       END IF
