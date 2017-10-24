@@ -1,4 +1,4 @@
-*> \brief \b DSYTRS_AA
+*> \brief \b DSYTRS_CA
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -6,39 +6,38 @@
 *            http://www.netlib.org/lapack/explore-html/
 *
 *> \htmlonly
-*> Download DSYTRS_AA + dependencies
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrs_aa.f">
+*> Download DSYTRS_CA + dependencies
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrs_ca.f">
 *> [TGZ]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrs_aa.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrs_ca.f">
 *> [ZIP]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrs_aa.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrs_ca.f">
 *> [TXT]</a>
 *> \endhtmlonly
 *
 *  Definition:
 *  ===========
 *
-*       SUBROUTINE DSYTRS_AA( UPLO, N, NRHS, A, LDA, IPIV, B, LDB,
-*                             WORK, LWORK, INFO )
+*      SUBROUTINE DSYTRS_CA( UPLO, N, NB, NRHS, A, LDA, TB, LDTB, IPIV, 
+*                            IPIV2, B, LDB, INFO )
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
-*       INTEGER            N, NRHS, LDA, LDB, LWORK, INFO
+*       INTEGER            N, NB, NRHS, LDA, LDTB, LDB, INFO
 *       ..
 *       .. Array Arguments ..
-*       INTEGER            IPIV( * )
-*       DOUBLE PRECISION   A( LDA, * ), B( LDB, * ), WORK( * )
+*       INTEGER            IPIV( * ), IPIV2( * )
+*       DOUBLE PRECISION   A( LDA, * ), TB( LDTB, * ), B( LDB, * )
 *       ..
-*
 *
 *> \par Purpose:
 *  =============
 *>
 *> \verbatim
 *>
-*> DSYTRS_AA solves a system of linear equations A*X = B with a real
+*> DSYTRS_CA solves a system of linear equations A*X = B with a real
 *> symmetric matrix A using the factorization A = U*T*U**T or
-*> A = L*T*L**T computed by DSYTRF_AA.
+*> A = L*T*L**T computed by DSYTRF_CA.
 *> \endverbatim
 *
 *  Arguments:
@@ -59,6 +58,12 @@
 *>          The order of the matrix A.  N >= 0.
 *> \endverbatim
 *>
+*> \param[in] NB
+*> \verbatim
+*>          NB is INTEGER
+*>          The bandwidth of the matrix T.  NB > 0.
+*> \endverbatim
+*>
 *> \param[in] NRHS
 *> \verbatim
 *>          NRHS is INTEGER
@@ -69,7 +74,7 @@
 *> \param[in] A
 *> \verbatim
 *>          A is DOUBLE PRECISION array, dimension (LDA,N)
-*>          Details of factors computed by DSYTRF_AA.
+*>          Details of factors computed by DSYTRF_CA.
 *> \endverbatim
 *>
 *> \param[in] LDA
@@ -78,10 +83,27 @@
 *>          The leading dimension of the array A.  LDA >= max(1,N).
 *> \endverbatim
 *>
+*> \param[out] TB
+*> \verbatim
+*>          TB is DOUBLE PRECISION array, dimension (LDTB, N)
+*>          Details of factors computed by DSYTRF_CA.
+*> \endverbatim
+*>
+*> \param[in] LDTB
+*> \verbatim
+*>          The leading dimension of the array TB. LDTB >= 3*NB+1.
+*> \endverbatim
+*>
 *> \param[in] IPIV
 *> \verbatim
 *>          IPIV is INTEGER array, dimension (N)
-*>          Details of the interchanges as computed by DSYTRF_AA.
+*>          Details of the interchanges as computed by DSYTRF_CA.
+*> \endverbatim
+*>
+*> \param[in] IPIV2
+*> \verbatim
+*>          IPIV2 is INTEGER array, dimension (N)
+*>          Details of the interchanges as computed by DSYTRF_CA.
 *> \endverbatim
 *>
 *> \param[in,out] B
@@ -96,15 +118,6 @@
 *>          LDB is INTEGER
 *>          The leading dimension of the array B.  LDB >= max(1,N).
 *> \endverbatim
-*>
-*> \param[in] WORK
-*> \verbatim
-*>          WORK is DOUBLE array, dimension (MAX(1,LWORK))
-*> \endverbatim
-*>
-*> \param[in] LWORK
-*> \verbatim
-*>          LWORK is INTEGER, LWORK >= MAX(1,3*N-2).
 *>
 *> \param[out] INFO
 *> \verbatim
@@ -179,7 +192,7 @@
          INFO = -8
       END IF
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DSYTRS_AA', -INFO )
+         CALL XERBLA( 'DSYTRS_CA', -INFO )
          RETURN
       END IF
 *
@@ -192,68 +205,73 @@
 *
 *        Solve A*X = B, where A = U*T*U**T.
 *
-*        Pivot, P**T * B
-*
-         CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
-*
-*        Compute (U**T \P**T * B) -> B    [ (U**T \P**T * B) ]
-*
          IF( N.GT.NB ) THEN
+*
+*           Pivot, P**T * B
+*
+            CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
+*
+*           Compute (U**T \P**T * B) -> B    [ (U**T \P**T * B) ]
+*
             CALL DTRSM( 'L', 'U', 'T', 'U', N-NB, NRHS, ONE, A(1, NB+1),
      $                 LDA, B(NB+1, 1), LDB)
+*
          END IF
 *
 *        Compute T \ B -> B   [ T \ (U**T \P**T * B) ]
 *
          CALL DGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
      $               INFO)
-*
-*        Compute (U \ B) -> B   [ U \ (T \ (U**T \P**T * B) ) ]
-*
          IF( N.GT.NB ) THEN
+*
+*           Compute (U \ B) -> B   [ U \ (T \ (U**T \P**T * B) ) ]
+*
             CALL DTRSM( 'L', 'U', 'N', 'U', N-NB, NRHS, ONE, A(1, NB+1),
      $                  LDA, B(NB+1, 1), LDB)
+*
+*           Pivot, P * B  [ P * (U \ (T \ (U**T \P**T * B) )) ]
+*
+            CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
+*
          END IF
-*
-*        Pivot, P * B  [ P * (U \ (T \ (U**T \P**T * B) )) ]
-*
-         CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
 *
       ELSE
 *
 *        Solve A*X = B, where A = L*T*L**T.
 *
-*        Pivot, P**T * B
-*
-         CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
-*
-*        Compute (L \P**T * B) -> B    [ (L \P**T * B) ]
-*
          IF( N.GT.NB ) THEN
+*
+*           Pivot, P**T * B
+*
+            CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
+*
+*           Compute (L \P**T * B) -> B    [ (L \P**T * B) ]
+*
             CALL DTRSM( 'L', 'L', 'N', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
      $                 LDA, B(NB+1, 1), LDB)
+*
          END IF
 *
 *        Compute T \ B -> B   [ T \ (L \P**T * B) ]
 *
          CALL DGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
      $               INFO)
-*
-*        Compute (L**T \ B) -> B   [ L**T \ (T \ (L \P**T * B) ) ]
-*
          IF( N.GT.NB ) THEN
+*
+*           Compute (L**T \ B) -> B   [ L**T \ (T \ (L \P**T * B) ) ]
+*
             CALL DTRSM( 'L', 'L', 'T', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
      $                  LDA, B(NB+1, 1), LDB)
+*
+*           Pivot, P * B  [ P * (L**T \ (T \ (L \P**T * B) )) ]
+*
+            CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
+*
          END IF
-*
-*        Pivot, P * B  [ P * (L**T \ (T \ (L \P**T * B) )) ]
-*
-         CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
-*
       END IF
 *
       RETURN
 *
-*     End of DSYTRS_AA
+*     End of DSYTRS_CA
 *
       END

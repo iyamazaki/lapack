@@ -18,8 +18,8 @@
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE DSYTRF_CA( UPLO, FLAG, N, NB, A, LDA, TB, LDTB, WORK,
-*                            LWORK, IPIV, IPIV2, INFO)
+*      SUBROUTINE DSYTRF_CA( UPLO, N, NB, A, LDA, TB, LDTB, WORK, LWORK,
+*                            IPIV, IPIV2, INFO)
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
@@ -200,7 +200,7 @@
       ELSE IF( N.LT.0 ) THEN
          INFO = -2
       ELSE IF( LDA.LT.MAX( 1, N ) ) THEN
-         INFO = -4
+         INFO = -5
       ELSE IF ( LDTB .LT. 3*NB+1 ) THEN
          INFO = -7
       ELSE IF ( LWORK .LT. (N*NB) ) THEN
@@ -218,15 +218,8 @@
           RETURN
       ENDIF
 *
-*     Determine the block size
+*     Determine the number of the block columns
 *
-c      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
-c      IF ( LWORK .LT. (N*NB) ) THEN
-c          NB = LWORK / N
-c      END IF
-c      IF ( LDTB .LT. 3*NB+1 ) THEN
-c          NB = (LDTB-1) / 3
-c      END IF
       NT = (N+NB-1)/NB
       TD = 2*NB
       KB = MIN(NB, N)
@@ -236,6 +229,8 @@ c      END IF
       DO J = 1, KB
          IPIV( J ) = J
       END DO
+      CALL DLASET( 'Full', LDTB, N, ZERO, ZERO, 
+     $             TB, LDTB )
 *
       IF( UPPER ) THEN
 *
@@ -308,7 +303,7 @@ c      END IF
                   TB( TD+(K-I)+1, J*NB+I ) = TB( TD-(K-(I+1)), J*NB+K )
                END DO
             END DO
-
+*
             IF( J.LT.NT-1 ) THEN
                IF( J.GT.0 ) THEN
 *
@@ -388,7 +383,7 @@ c               END IF
 *              Apply pivots to trailing submatrix of A
 *     
                DO K = 1, KB
-*                 > Adjust ipiv               
+*                 > Adjust ipiv
                   IPIV( (J+1)*NB+K ) = IPIV( (J+1)*NB+K ) + (J+1)*NB
 *                  
                   I1 = (J+1)*NB+K
@@ -492,7 +487,7 @@ c     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
                   TB( TD-(K-(I+1)), J*NB+K ) = TB( TD+(K-I)+1, J*NB+I )
                END DO
             END DO
-
+*
             IF( J.LT.NT-1 ) THEN
                IF( J.GT.0 ) THEN
 *
