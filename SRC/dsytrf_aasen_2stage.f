@@ -42,7 +42,7 @@
 *>
 *> where U (or L) is a product of permutation and unit upper (lower)
 *> triangular matrices, and T is a symmetric band matrix with the
-*> band width of NB (internally selected).
+*> bandwidth of NB (internally selected).
 *>
 *> This is the blocked version of the algorithm, calling Level 3 BLAS.
 *> \endverbatim
