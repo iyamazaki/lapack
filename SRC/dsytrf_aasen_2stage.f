@@ -222,7 +222,7 @@
 *
 *     Answer the query
 *
-      NB = ILAENV( 1, 'DSYTRF', UPLO, N, -1, -1, -1 )
+      NB = ILAENV( 1, 'DSYTRF_AASEN_2STAGE', UPLO, N, -1, -1, -1 )
       IF( INFO.EQ.0 ) THEN
          IF( TQUERY ) THEN
             TB( 1, 1 ) = 3*NB+1
