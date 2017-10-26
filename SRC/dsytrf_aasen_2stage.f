@@ -256,13 +256,11 @@
       TD = 2*NB
       KB = MIN(NB, N)
 *
-*     Initialize the first block column
+*     Initialize vectors/matrices
 *
       DO J = 1, KB
          IPIV( J ) = J
       END DO
-      CALL DLASET( 'Full', LDTB, N, ZERO, ZERO, 
-     $             TB, LDTB )
 *
 *     Save NB
 *
@@ -306,7 +304,7 @@
 *         
 *           Compute T(J,J)
 *     
-            CALL DLACPY( 'Full', KB, KB, A( J*NB+1, J*NB+1 ), LDA,
+            CALL DLACPY( 'Upper', KB, KB, A( J*NB+1, J*NB+1 ), LDA,
      $                   TB( TD+1, J*NB+1 ), LDTB-1 ) 
             IF( J.GT.1 ) THEN
 *              T(J,J) = U(1:J,J)'*H(1:J)             
@@ -393,9 +391,11 @@ c               END IF
      $                         A( J*NB+K, (J+1)*NB+1 ), LDA)
                END DO
 *         
-*              Compute T(J+1, J)     
+*              Compute T(J+1, J), zero out for GEMM update
 *     
                KB = MIN(NB, N-(J+1)*NB)
+               CALL DLASET( 'Full', KB, NB, ZERO, ZERO, 
+     $                      TB( TD+NB+1, J*NB+1) , LDTB-1 )
                CALL DLACPY( 'Upper', KB, NB,
      $                      WORK, N,
      $                      TB( TD+NB+1, J*NB+1 ), LDTB-1 )
@@ -405,10 +405,11 @@ c               END IF
      $                        TB( TD+NB+1, J*NB+1 ), LDTB-1 )
                END IF
 *
-*              Copy T(J,J+1) into T(J+1, J)
+*              Copy T(J,J+1) into T(J+1, J), both upper/lower for GEMM
+*              updates
 *
                DO K = 1, NB
-                  DO I = 1, MIN(K, KB)
+                  DO I = 1, KB
                      TB( TD-NB+K-I+1, J*NB+NB+I )
      $                  = TB( TD+NB+I-K+1, J*NB+K )
                   END DO
@@ -490,7 +491,7 @@ c     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
 *         
 *           Compute T(J,J)
 *     
-            CALL DLACPY( 'Full', KB, KB, A( J*NB+1, J*NB+1 ), LDA,
+            CALL DLACPY( 'Lower', KB, KB, A( J*NB+1, J*NB+1 ), LDA,
      $                   TB( TD+1, J*NB+1 ), LDTB-1 ) 
             IF( J.GT.1 ) THEN
 *              T(J,J) = L(J,1:J)*H(1:J)             
@@ -561,9 +562,11 @@ c               IF (IINFO.NE.0 .AND. INFO.EQ.0) THEN
 c                  INFO = IINFO+(J+1)*NB
 c               END IF
 *         
-*              Compute T(J+1, J)     
+*              Compute T(J+1, J), zero out for GEMM update
 *     
                KB = MIN(NB, N-(J+1)*NB)
+               CALL DLASET( 'Full', KB, NB, ZERO, ZERO, 
+     $                      TB( TD+NB+1, J*NB+1) , LDTB-1 )
                CALL DLACPY( 'Upper', KB, NB,
      $                      A( (J+1)*NB+1, J*NB+1 ), LDA,
      $                      TB( TD+NB+1, J*NB+1 ), LDTB-1 )
@@ -573,10 +576,11 @@ c               END IF
      $                        TB( TD+NB+1, J*NB+1 ), LDTB-1 )
                END IF
 *
-*              Copy T(J+1,J) into T(J, J+1)
+*              Copy T(J+1,J) into T(J, J+1), both upper/lower for GEMM
+*              updates
 *
                DO K = 1, NB
-                  DO I = 1, MIN(K, KB)
+                  DO I = 1, KB
                      TB( TD-NB+K-I+1, J*NB+NB+I ) =
      $                  TB( TD+NB+I-K+1, J*NB+K )
                   END DO
