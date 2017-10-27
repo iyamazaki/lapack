@@ -18,16 +18,16 @@
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LDTB, IPIV, 
+*      SUBROUTINE DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB, IPIV, 
 *                                      IPIV2, B, LDB, INFO )
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
-*       INTEGER            N, NRHS, LDA, LDTB, LDB, INFO
+*       INTEGER            N, NRHS, LDA, LTB, LDB, INFO
 *       ..
 *       .. Array Arguments ..
 *       INTEGER            IPIV( * ), IPIV2( * )
-*       DOUBLE PRECISION   A( LDA, * ), TB( LDTB, * ), B( LDB, * )
+*       DOUBLE PRECISION   A( LDA, * ), TB( * ), B( LDB, * )
 *       ..
 *
 *> \par Purpose:
@@ -79,13 +79,13 @@
 *>
 *> \param[out] TB
 *> \verbatim
-*>          TB is DOUBLE PRECISION array, dimension (LDTB, N)
+*>          TB is DOUBLE PRECISION array, dimension (LTB)
 *>          Details of factors computed by DSYTRF_AASEN_2STAGE.
 *> \endverbatim
 *>
-*> \param[in] LDTB
+*> \param[in] LTB
 *> \verbatim
-*>          The leading dimension of the array TB. LDTB >= 4.
+*>          The size of the array TB. LTB >= 4*N.
 *> \endverbatim
 *>
 *> \param[in] IPIV
@@ -135,7 +135,7 @@
 *> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LDTB,
+      SUBROUTINE DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
      $                                IPIV, IPIV2, B, LDB, INFO )
 *
 *  -- LAPACK computational routine (version 3.7.1) --
@@ -147,11 +147,11 @@
 *
 *     .. Scalar Arguments ..
       CHARACTER          UPLO
-      INTEGER            N, NRHS, LDA, LDTB, LDB, INFO
+      INTEGER            N, NRHS, LDA, LTB, LDB, INFO
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
-      DOUBLE PRECISION   A( LDA, * ), TB( LDTB, * ), B( LDB, * )
+      DOUBLE PRECISION   A( LDA, * ), TB( * ), B( LDB, * )
 *     ..
 *
 *  =====================================================================
@@ -160,7 +160,7 @@
       PARAMETER          ( ONE = 1.0D+0 )
 *     ..
 *     .. Local Scalars ..
-      INTEGER            NB
+      INTEGER            LDTB, NB
       LOGICAL            UPPER
 *     ..
 *     .. External Functions ..
@@ -185,8 +185,10 @@
          INFO = -3
       ELSE IF( LDA.LT.MAX( 1, N ) ) THEN
          INFO = -5
+      ELSE IF( LTB.LT.( 4*N ) ) THEN
+         INFO = -7
       ELSE IF( LDB.LT.MAX( 1, N ) ) THEN
-         INFO = -8
+         INFO = -11
       END IF
       IF( INFO.NE.0 ) THEN
          CALL XERBLA( 'DSYTRS_AASEN_2STAGE', -INFO )
@@ -198,9 +200,10 @@
       IF( N.EQ.0 .OR. NRHS.EQ.0 )
      $   RETURN
 *
-*     Read NB
+*     Read NB and compute LDTB
 *
-      NB = TB( 1, 1 )
+      NB = TB( 1 )
+      LDTB = LTB/N
 *
       IF( UPPER ) THEN
 *

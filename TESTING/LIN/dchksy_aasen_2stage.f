@@ -429,7 +429,7 @@
                   SRNAMT = 'DSYTRF_AASEN_2STAGE'
                   LWORK = MIN(N*NB, 3*NMAX*NMAX)
                   CALL DSYTRF_AASEN_2STAGE( UPLO, N, AFAC, LDA, 
-     $                                      AINV, 3*NB+1, 
+     $                                      AINV, (3*NB+1)*N, 
      $                                      WORK, LWORK,
      $                                      IWORK, IWORK( 1+N ),
      $                                      INFO )
@@ -511,8 +511,8 @@ c                  NT = 1
                      SRNAMT = 'DSYTRS_AASEN_2STAGE'
                      LWORK = MAX( 1, 3*N-2 )
                      CALL DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, AFAC, LDA,
-     $                               AINV, 3*NB+1, IWORK, IWORK( 1+N ), 
-     $                               X, LDA, INFO )
+     $                            AINV, (3*NB+1)*N, IWORK, IWORK( 1+N ),
+     $                            X, LDA, INFO )
 *
 *                    Check error code from DSYTRS and handle error.
 *
