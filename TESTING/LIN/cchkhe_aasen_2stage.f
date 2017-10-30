@@ -1,6 +1,6 @@
 *> \brief \b DCHKSY_AASEN_2STAGE
 *
-* @precisions fortran d -> s c
+* @generated from dsytrf_aasen_2stage.f, fortran d -> c, Mon Oct 30 12:03:46 2017
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -10,7 +10,7 @@
 *  Definition:
 *  ===========
 *
-*       SUBROUTINE DCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, 
+*       SUBROUTINE CCHKHE_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, 
 *                             NNS, NSVAL, THRESH, TSTERR, NMAX, A,
 *                             AFAC, AINV, B, X, XACT, WORK, RWORK,
 *                             IWORK, NOUT )
@@ -18,12 +18,12 @@
 *       .. Scalar Arguments ..
 *       LOGICAL            TSTERR
 *       INTEGER            NMAX, NN, NNB, NNS, NOUT
-*       DOUBLE PRECISION   THRESH
+*       COMPLEX            THRESH
 *       ..
 *       .. Array Arguments ..
 *       LOGICAL            DOTYPE( * )
 *       INTEGER            IWORK( * ), NBVAL( * ), NSVAL( * ), NVAL( * )
-*       DOUBLE PRECISION   A( * ), AFAC( * ), AINV( * ), B( * ),
+*       COMPLEX            A( * ), AFAC( * ), AINV( * ), B( * ),
 *      $                   RWORK( * ), WORK( * ), X( * ), XACT( * )
 *       ..
 *
@@ -33,7 +33,7 @@
 *>
 *> \verbatim
 *>
-*> DCHKSY_AASEN_2STAGE tests DSYTRF_AASEN_2STAGE, -TRS_AASEN_2STAGE.
+*> DCHKSY_AASEN_2STAGE tests CHETRF_AASEN_2STAGE, -TRS_AASEN_2STAGE.
 *> \endverbatim
 *
 *  Arguments:
@@ -85,7 +85,7 @@
 *>
 *> \param[in] THRESH
 *> \verbatim
-*>          THRESH is DOUBLE PRECISION
+*>          THRESH is COMPLEX
 *>          The threshold value for the test ratios.  A result is
 *>          included in the output file if RESULT >= THRESH.  To have
 *>          every test ratio printed, use THRESH = 0.
@@ -106,43 +106,43 @@
 *>
 *> \param[out] A
 *> \verbatim
-*>          A is DOUBLE PRECISION array, dimension (NMAX*NMAX)
+*>          A is COMPLEX array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] AFAC
 *> \verbatim
-*>          AFAC is DOUBLE PRECISION array, dimension (NMAX*NMAX)
+*>          AFAC is COMPLEX array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] AINV
 *> \verbatim
-*>          AINV is DOUBLE PRECISION array, dimension (NMAX*NMAX)
+*>          AINV is COMPLEX array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] B
 *> \verbatim
-*>          B is DOUBLE PRECISION array, dimension (NMAX*NSMAX)
+*>          B is COMPLEX array, dimension (NMAX*NSMAX)
 *>          where NSMAX is the largest entry in NSVAL.
 *> \endverbatim
 *>
 *> \param[out] X
 *> \verbatim
-*>          X is DOUBLE PRECISION array, dimension (NMAX*NSMAX)
+*>          X is COMPLEX array, dimension (NMAX*NSMAX)
 *> \endverbatim
 *>
 *> \param[out] XACT
 *> \verbatim
-*>          XACT is DOUBLE PRECISION array, dimension (NMAX*NSMAX)
+*>          XACT is COMPLEX array, dimension (NMAX*NSMAX)
 *> \endverbatim
 *>
 *> \param[out] WORK
 *> \verbatim
-*>          WORK is DOUBLE PRECISION array, dimension (NMAX*max(3,NSMAX))
+*>          WORK is COMPLEX array, dimension (NMAX*max(3,NSMAX))
 *> \endverbatim
 *>
 *> \param[out] RWORK
 *> \verbatim
-*>          RWORK is DOUBLE PRECISION array, dimension (max(NMAX,2*NSMAX))
+*>          RWORK is COMPLEX array, dimension (max(NMAX,2*NSMAX))
 *> \endverbatim
 *>
 *> \param[out] IWORK
@@ -166,12 +166,12 @@
 *
 *> \date June 2017
 *
-*  @precisions fortran d -> z c
+*  @generated from dsytrf_aasen_2stage.f, fortran d -> c, Mon Oct 30 12:03:46 2017
 *
-*> \ingroup double_lin
+*> \ingroup complex_lin
 *
 *  =====================================================================
-      SUBROUTINE DCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, NNS,
+      SUBROUTINE CCHKHE_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, NNS,
      $                      NSVAL, THRESH, TSTERR, NMAX, A, AFAC, AINV,
      $                      B, X, XACT, WORK, RWORK, IWORK, NOUT )
 *
@@ -185,20 +185,21 @@
 *     .. Scalar Arguments ..
       LOGICAL            TSTERR
       INTEGER            NN, NNB, NNS, NMAX, NOUT
-      DOUBLE PRECISION   THRESH
+      REAL               THRESH
 *     ..
 *     .. Array Arguments ..
       LOGICAL            DOTYPE( * )
       INTEGER            IWORK( * ), NBVAL( * ), NSVAL( * ), NVAL( * )
-      DOUBLE PRECISION   A( * ), AFAC( * ), AINV( * ), B( * ),
+      COMPLEX            A( * ), AFAC( * ), AINV( * ), B( * ),
      $                   RWORK( * ), WORK( * ), X( * ), XACT( * )
 *     ..
 *
 *  =====================================================================
 *
 *     .. Parameters ..
-      DOUBLE PRECISION   ZERO, ONE
-      PARAMETER          ( ZERO = 0.0D+0, ONE = 1.0D+0 )
+      COMPLEX            ZERO, ONE
+      PARAMETER          ( ZERO = ( 0.0E+0, 0.0E+0 ), 
+     $                     ONE  = ( 1.0E+0, 0.0E+0 ) )
       INTEGER            NTYPES
       PARAMETER          ( NTYPES = 10 )
       INTEGER            NTESTS
@@ -211,17 +212,17 @@
       INTEGER            I, I1, I2, IMAT, IN, INB, INFO, IOFF, IRHS,
      $                   IUPLO, IZERO, J, K, KL, KU, LDA, LWORK, MODE,
      $                   N, NB, NERRS, NFAIL, NIMAT, NRHS, NRUN, NT
-      DOUBLE PRECISION   ANORM, CNDNUM
+      COMPLEX            ANORM, CNDNUM
 *     ..
 *     .. Local Arrays ..
       CHARACTER          UPLOS( 2 )
       INTEGER            ISEED( 4 ), ISEEDY( 4 )
-      DOUBLE PRECISION   RESULT( NTESTS )
+      REAL               RESULT( NTESTS )
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           ALAERH, ALAHD, ALASUM, DERRSY, DLACPY, DLARHS,
-     $                   DLATB4, DLATMS, DPOT02, DSYT01, 
-     $                   DSYTRF_AASEN_2STAGE, DSYTRS_AASEN_2STAGE,
+      EXTERNAL           ALAERH, ALAHD, ALASUM, CERRHE, CLACPY, CLARHS,
+     $                   CLATB4, CLATMS, CPOT02, DSYT01, 
+     $                   CHETRF_AASEN_2STAGE, CHETRS_AASEN_2STAGE,
      $                   XLAENV
 *     ..
 *     .. Intrinsic Functions ..
@@ -246,13 +247,13 @@
 *
 *     Test path
 *
-      PATH( 1: 1 ) = 'Double precision'
-      PATH( 2: 3 ) = 'SA'
+      PATH( 1: 1 ) = 'Complex precision'
+      PATH( 2: 3 ) = 'HA'
 *
 *     Path to generate matrices
 *
-      MATPATH( 1: 1 ) = 'Double precision'
-      MATPATH( 2: 3 ) = 'SY'
+      MATPATH( 1: 1 ) = 'Complex precision'
+      MATPATH( 2: 3 ) = 'HE'
       NRUN = 0
       NFAIL = 0
       NERRS = 0
@@ -263,7 +264,7 @@
 *     Test the error exits
 *
       IF( TSTERR )
-     $   CALL DERRSY( PATH, NOUT )
+     $   CALL CERRHE( PATH, NOUT )
       INFOT = 0
 *
 *     Set the minimum block size for which the block routine should
@@ -311,23 +312,23 @@
 *              Begin generate the test matrix A.
 *
 *
-*              Set up parameters with DLATB4 for the matrix generator
+*              Set up parameters with CLATB4 for the matrix generator
 *              based on the type of matrix to be generated.
 *
-               CALL DLATB4( MATPATH, IMAT, N, N, TYPE, KL, KU,
+               CALL CLATB4( MATPATH, IMAT, N, N, TYPE, KL, KU,
      $                      ANORM, MODE, CNDNUM, DIST )
 *
-*              Generate a matrix with DLATMS.
+*              Generate a matrix with CLATMS.
 *
-               SRNAMT = 'DLATMS'
-               CALL DLATMS( N, N, DIST, ISEED, TYPE, RWORK, MODE,
+               SRNAMT = 'CLATMS'
+               CALL CLATMS( N, N, DIST, ISEED, TYPE, RWORK, MODE,
      $                      CNDNUM, ANORM, KL, KU, UPLO, A, LDA, WORK,
      $                      INFO )
 *
-*              Check error code from DLATMS and handle error.
+*              Check error code from CLATMS and handle error.
 *
                IF( INFO.NE.0 ) THEN
-                  CALL ALAERH( PATH, 'DLATMS', INFO, 0, UPLO, N, N, -1,
+                  CALL ALAERH( PATH, 'CLATMS', INFO, 0, UPLO, N, N, -1,
      $                         -1, -1, IMAT, NFAIL, NERRS, NOUT )
 *
 *                    Skip all tests for this generated matrix
@@ -421,16 +422,16 @@
 *                 will be factorized in place. This is needed to
 *                 preserve the test matrix A for subsequent tests.
 *
-                  CALL DLACPY( UPLO, N, N, A, LDA, AFAC, LDA )
+                  CALL CLACPY( UPLO, N, N, A, LDA, AFAC, LDA )
 *
 *                 Compute the L*D*L**T or U*D*U**T factorization of the
 *                 matrix. IWORK stores details of the interchanges and
 *                 the block structure of D. AINV is a work array for
 *                 block factorization, LWORK is the length of AINV.
 *
-                  SRNAMT = 'DSYTRF_AASEN_2STAGE'
+                  SRNAMT = 'CHETRF_AASEN_2STAGE'
                   LWORK = MIN(N*NB, 3*NMAX*NMAX)
-                  CALL DSYTRF_AASEN_2STAGE( UPLO, N, AFAC, LDA, 
+                  CALL CHETRF_AASEN_2STAGE( UPLO, N, AFAC, LDA, 
      $                                      AINV, (3*NB+1)*N, 
      $                                      WORK, LWORK,
      $                                      IWORK, IWORK( 1+N ),
@@ -456,10 +457,10 @@
                      K = 0
                   END IF
 *
-*                 Check error code from DSYTRF and handle error.
+*                 Check error code from CHETRF and handle error.
 *
                   IF( INFO.NE.K ) THEN
-                     CALL ALAERH( PATH, 'DSYTRF_AASEN_2STAGE', INFO, K,
+                     CALL ALAERH( PATH, 'CHETRF_AASEN_2STAGE', INFO, K,
      $                            UPLO, N, N, -1, -1, NB, IMAT, NFAIL,
      $                            NERRS, NOUT )
                   END IF
@@ -504,33 +505,33 @@ c                  NT = 1
 *                    Choose a set of NRHS random solution vectors
 *                    stored in XACT and set up the right hand side B
 *
-                     SRNAMT = 'DLARHS'
-                     CALL DLARHS( MATPATH, XTYPE, UPLO, ' ', N, N,
+                     SRNAMT = 'CLARHS'
+                     CALL CLARHS( MATPATH, XTYPE, UPLO, ' ', N, N,
      $                            KL, KU, NRHS, A, LDA, XACT, LDA,
      $                            B, LDA, ISEED, INFO )
-                     CALL DLACPY( 'Full', N, NRHS, B, LDA, X, LDA )
+                     CALL CLACPY( 'Full', N, NRHS, B, LDA, X, LDA )
 *
-                     SRNAMT = 'DSYTRS_AASEN_2STAGE'
+                     SRNAMT = 'CHETRS_AASEN_2STAGE'
                      LWORK = MAX( 1, 3*N-2 )
-                     CALL DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, AFAC, LDA,
+                     CALL CHETRS_AASEN_2STAGE( UPLO, N, NRHS, AFAC, LDA,
      $                            AINV, (3*NB+1)*N, IWORK, IWORK( 1+N ),
      $                            X, LDA, INFO )
 *
-*                    Check error code from DSYTRS and handle error.
+*                    Check error code from CHETRS and handle error.
 *
                      IF( INFO.NE.0 ) THEN
                         IF( IZERO.EQ.0 ) THEN
-                           CALL ALAERH( PATH, 'DSYTRS_AASEN_2STAGE',
+                           CALL ALAERH( PATH, 'CHETRS_AASEN_2STAGE',
      $                                  INFO, 0, UPLO, N, N, -1, -1,
      $                                  NRHS, IMAT, NFAIL, NERRS, NOUT )
                         END IF
                      ELSE
-                        CALL DLACPY( 'Full', N, NRHS, B, LDA, WORK, LDA
+                        CALL CLACPY( 'Full', N, NRHS, B, LDA, WORK, LDA
      $                               )
 *
 *                       Compute the residual for the solution
 *
-                        CALL DPOT02( UPLO, N, NRHS, A, LDA, X, LDA,
+                        CALL CPOT02( UPLO, N, NRHS, A, LDA, X, LDA,
      $                               WORK, LDA, RWORK, RESULT( 2 ) )
 *
 *
