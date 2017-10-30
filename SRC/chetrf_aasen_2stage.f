@@ -197,7 +197,7 @@
       EXTERNAL           XERBLA
 *     ..
 *     .. Intrinsic Functions ..
-      INTRINSIC          MIN, MAX
+      INTRINSIC          CONJG, MIN, MAX
 *     ..
 *     .. Executable Statements ..
 *
@@ -284,7 +284,7 @@
             KB = MIN(NB, N-J*NB)
             DO I = 1, J-1
                IF( I.EQ.1 ) THEN
-*                  H(I,J) = T(I,I)*U(I,J) + T(I+1,I)'*U(I+1,J)
+*                  H(I,J) = T(I,I)*U(I,J) + T(I+1,I)*U(I+1,J)
                    CALL CGEMM( 'NoTranspose', 'NoTranspose',
      $                     NB, KB, 2*NB,
      $                     ONE, TB( TD+1 + (I*NB)*LDTB ), LDTB-1,
@@ -341,9 +341,11 @@
 *           Expand T(J,J) into full format
 *
             DO I = 1, KB
+               TB( TD+1 + (J*NB+I-1)*LDTB )
+     $            = REAL( TB( TD+1 + (J*NB+I-1)*LDTB ) )
                DO K = I+1, KB
                   TB( TD+(K-I)+1 + (J*NB+I-1)*LDTB )
-     $                = CONJG( TB( TD-(K-(I+1)) + (J*NB+K-1)*LDTB ) )
+     $               = CONJG( TB( TD-(K-(I+1)) + (J*NB+K-1)*LDTB ) )
                END DO
             END DO
 *
@@ -396,11 +398,16 @@ c               END IF
 *              Copy panel back
 *
                DO K = 1, NB
-                   CALL CCOPY( N-(J+1)*NB,
-     $                         WORK( 1+(K-1)*N ), 1,
-     $                         A( J*NB+K, (J+1)*NB+1 ), LDA )
-                   CALL CLACGV( N-(J+1)*NB, A( J*NB+K, (J+1)*NB+1 ),
-     $                          LDA)
+*
+*                  Copy only L-factor
+*
+                   CALL CCOPY( N-K-(J+1)*NB,
+     $                         WORK( K+1+(K-1)*N ), 1,
+     $                         A( J*NB+K, (J+1)*NB+K+1 ), LDA )
+*
+*                  Transpose U-factor to be copied back into T(J+1, J)
+*
+                   CALL CLACGV( K, WORK( 1+(K-1)*N ), 1 )
                END DO
 *         
 *              Compute T(J+1, J), zero out for GEMM update
@@ -445,7 +452,7 @@ c               END IF
                      CALL CSWAP( I2-I1-1, A( I1, I1+1 ), LDA,
      $                                    A( I1+1, I2 ), 1 )
                      CALL CLACGV( I2-I1, A( I1, I1+1 ), LDA )
-                     CALL CLACGV( I2-I1-1, A( I1+1, I1 ), 1 )
+                     CALL CLACGV( I2-I1-1, A( I1+1, I2 ), 1 )
 *                    > Swap A(I2+1:M, I1) with A(I2+1:M, I2)
                      CALL CSWAP( N-I2, A( I1, I2+1 ), LDA,
      $                                 A( I2, I2+1 ), LDA ) 
@@ -532,9 +539,11 @@ c               END IF
 *           Expand T(J,J) into full format
 *
             DO I = 1, KB
+               TB( TD+1 + (J*NB+I-1)*LDTB ) 
+     $            = REAL( TB( TD+1 + (J*NB+I-1)*LDTB ) )
                DO K = I+1, KB
                   TB( TD-(K-(I+1)) + (J*NB+K-1)*LDTB )
-     $                = CONJG( TB( TD+(K-I)+1 + (J*NB+I-1)*LDTB ) )
+     $               = CONJG( TB( TD+(K-I)+1 + (J*NB+I-1)*LDTB ) )
                END DO
             END DO
 *
@@ -595,8 +604,8 @@ c               END IF
 *
                DO K = 1, NB
                   DO I = 1, KB
-                     TB( TD-NB+K-I+1 + (J*NB+NB+I-1)*LDTB ) =
-     $                  CONJG( TB( TD+NB+I-K+1 + (J*NB+K-1)*LDTB ) )
+                     TB( TD-NB+K-I+1 + (J*NB+NB+I-1)*LDTB )
+     $                  = CONJG( TB( TD+NB+I-K+1 + (J*NB+K-1)*LDTB ) )
                   END DO
                END DO
                CALL CLASET( 'Upper', KB, NB, ZERO, ONE, 

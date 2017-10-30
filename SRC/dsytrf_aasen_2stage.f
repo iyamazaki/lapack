@@ -281,7 +281,7 @@
             KB = MIN(NB, N-J*NB)
             DO I = 1, J-1
                IF( I.EQ.1 ) THEN
-*                  H(I,J) = T(I,I)*U(I,J) + T(I+1,I)'*U(I+1,J)
+*                  H(I,J) = T(I,I)*U(I,J) + T(I+1,I)*U(I+1,J)
                    CALL DGEMM( 'NoTranspose', 'NoTranspose',
      $                     NB, KB, 2*NB,
      $                     ONE, TB( TD+1 + (I*NB)*LDTB ), LDTB-1,
