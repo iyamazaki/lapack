@@ -453,11 +453,6 @@ c               END IF
                      END IF
                   ENDIF   
                END DO   
-*         
-*              Apply pivots to previous columns of L
-*         
-c               CALL DLASWP( J*NB, A( 1, 1 ), LDA, 
-c     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
             END IF
          END DO
       ELSE
