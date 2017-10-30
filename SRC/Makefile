@@ -150,6 +150,7 @@ SLASRC = \
    ssytri_rook.o ssycon_rook.o ssysv_rook.o \
    ssytf2_rk.o ssytrf_rk.o ssytrs_3.o \
    ssytri_3.o ssytri_3x.o ssycon_3.o ssysv_rk.o \
+   ssytrf_aasen_2stage.o ssytrs_aasen_2stage.o \
    slasyf_aa.o ssysv_aa.o ssytrf_aa.o ssytrs_aa.o \
    stbcon.o \
    stbrfs.o stbtrs.o stgevc.o stgex2.o stgexc.o stgsen.o \
@@ -211,6 +212,7 @@ CLASRC = \
    chetrs_rook.o checon_rook.o chesv_rook.o \
    chetf2_rk.o chetrf_rk.o chetri_3.o chetri_3x.o \
    chetrs_3.o checon_3.o chesv_rk.o \
+   chetrf_aasen_2stage.o chetrs_aasen_2stage.o \
    chesv_aa.o chetrf_aa.o chetrs_aa.o clahef_aa.o \
    chgeqz.o chpcon.o chpev.o  chpevd.o \
    chpevx.o chpgst.o chpgv.o  chpgvd.o chpgvx.o chprfs.o chpsv.o \
@@ -346,7 +348,7 @@ DLASRC = \
    dsytf2_rk.o dsytrf_rk.o dsytrs_3.o \
    dsytri_3.o dsytri_3x.o dsycon_3.o dsysv_rk.o \
    dlasyf_aa.o dsysv_aa.o dsytrf_aa.o dsytrs_aa.o \
-   dsytrf_ca.o dsytrs_ca.o \
+   dsytrf_aasen_2stage.o dsytrs_aasen_2stage.o \
    dtbcon.o dtbrfs.o dtbtrs.o dtgevc.o dtgex2.o dtgexc.o dtgsen.o \
    dtgsja.o dtgsna.o dtgsy2.o dtgsyl.o dtpcon.o dtprfs.o dtptri.o \
    dtptrs.o \
