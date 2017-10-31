@@ -742,6 +742,17 @@
             WRITE( NOUT, FMT = 9989 )PATH
          END IF
 *
+         IF( TSTDRV ) THEN
+            CALL DDRVSY_AASEN_2STAGE(
+     $                         DOTYPE, NN, NVAL, NRHS, THRESH, TSTERR,
+     $                         LDA, A( 1, 1 ), A( 1, 2 ), A( 1, 3 ),
+     $                         B( 1, 1 ), B( 1, 2 ), B( 1, 3 ),
+     $                         WORK, RWORK, IWORK, NOUT )
+         ELSE
+            WRITE( NOUT, FMT = 9988 )PATH
+         END IF
+*
+*
       ELSE IF( LSAMEN( 2, C2, 'SP' ) ) THEN
 *
 *        SP:  symmetric indefinite packed matrices,

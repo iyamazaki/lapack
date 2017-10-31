@@ -18,8 +18,8 @@
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE DSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, WORK, LWORK,
-*                                      IPIV, IPIV2, INFO)
+*      SUBROUTINE DSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV,
+*                                      IPIV2, WORK, LWORK, INFO )
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
@@ -209,11 +209,11 @@
       ELSE IF( N.LT.0 ) THEN
          INFO = -2
       ELSE IF( LDA.LT.MAX( 1, N ) ) THEN
-         INFO = -5
+         INFO = -4
       ELSE IF ( LTB .LT. 4*N .AND. .NOT.TQUERY ) THEN
-         INFO = -7
+         INFO = -6
       ELSE IF ( LWORK .LT. N .AND. .NOT.WQUERY ) THEN
-         INFO = -9
+         INFO = -10
       END IF
 *
       IF( INFO.NE.0 ) THEN
