@@ -430,8 +430,8 @@
                   LWORK = MIN(N*NB, 3*NMAX*NMAX)
                   CALL SSYTRF_AASEN_2STAGE( UPLO, N, AFAC, LDA, 
      $                                      AINV, (3*NB+1)*N, 
-     $                                      WORK, LWORK,
      $                                      IWORK, IWORK( 1+N ),
+     $                                      WORK, LWORK,
      $                                      INFO )
 *
 *                 Adjust the expected value of INFO to account for

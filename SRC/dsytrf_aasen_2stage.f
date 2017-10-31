@@ -155,8 +155,8 @@
 *> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, WORK,
-     $                                LWORK, IPIV, IPIV2, INFO )
+      SUBROUTINE DSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV,
+     $                                IPIV2, WORK, LWORK, INFO )
 *
 *  -- LAPACK computational routine (version 3.7.0) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --

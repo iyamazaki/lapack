@@ -20,8 +20,8 @@
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE SSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, WORK, LWORK,
-*                                      IPIV, IPIV2, INFO)
+*      SUBROUTINE SSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV, IPIV2,
+*                                      WORK, LWORK, INFO)
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
@@ -104,22 +104,6 @@
 *>          no error message related to LTB is issued by XERBLA.
 *> \endverbatim
 *>
-*> \param[out] WORK
-*> \verbatim
-*>          WORK is REAL workspace of size LWORK
-*> \endverbatim
-*>
-*> \param[in] LWORK
-*> \verbatim
-*>          The size of WORK. LWORK >= N, internally used to select NB
-*>          such that LWORK >= N*NB.
-*>
-*>          If LWORK = -1, then a workspace query is assumed; the
-*>          routine only calculates the optimal size of the WORK array,
-*>          returns this value as the first entry of the WORK array, and
-*>          no error message related to LWORK is issued by XERBLA.
-*> \endverbatim
-*>
 *> \param[out] IPIV
 *> \verbatim
 *>          IPIV is INTEGER array, dimension (N)
@@ -134,6 +118,22 @@
 *>          On exit, it contains the details of the interchanges, i.e.,
 *>          the row and column k of T were interchanged with the
 *>          row and column IPIV(k).
+*> \endverbatim
+*>
+*> \param[out] WORK
+*> \verbatim
+*>          WORK is REAL workspace of size LWORK
+*> \endverbatim
+*>
+*> \param[in] LWORK
+*> \verbatim
+*>          The size of WORK. LWORK >= N, internally used to select NB
+*>          such that LWORK >= N*NB.
+*>
+*>          If LWORK = -1, then a workspace query is assumed; the
+*>          routine only calculates the optimal size of the WORK array,
+*>          returns this value as the first entry of the WORK array, and
+*>          no error message related to LWORK is issued by XERBLA.
 *> \endverbatim
 *>
 *> \param[out] INFO
@@ -157,8 +157,8 @@
 *> \ingroup realSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE SSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, WORK,
-     $                                LWORK, IPIV, IPIV2, INFO )
+      SUBROUTINE SSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV,
+     $                                IPIV2, WORK, LWORK, INFO )
 *
 *  -- LAPACK computational routine (version 3.7.0) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
