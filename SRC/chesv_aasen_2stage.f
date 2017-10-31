@@ -1,8 +1,6 @@
-*> \brief \b CHESV_AASEN_2STAGE
+*> \brief <b> CHESV_AASEN_2STAGE computes the solution to system of linear equations A * X = B for HE matrices</b>
 *
 * @precisions fortran c -> s d
-*
-* @generated from SRC/dsytrf_aasen_2stage.f, fortran d -> c, Mon Oct 30 11:57:50 2017
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -11,11 +9,11 @@
 *
 *> \htmlonly
 *> Download CHESV_AASEN_2STAGE + dependencies
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/chetrf_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/chesv_aasen_2stage.f">
 *> [TGZ]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/chetrf_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/chesv_aasen_2stage.f">
 *> [ZIP]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/chetrf_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/chesv_aasen_2stage.f">
 *> [TXT]</a>
 *> \endhtmlonly
 *
@@ -40,15 +38,19 @@
 *>
 *> \verbatim
 *>
-*> CHESV_AASEN_2STAGE computes the factorization of a real hermitian matrix A
-*> using the Aasen's algorithm.  The form of the factorization is
+*> CHESV_AASEN_2STAGE computes the solution to a complex system of 
+*> linear equations
+*>    A * X = B,
+*> where A is an N-by-N Hermitian matrix and X and B are N-by-NRHS
+*> matrices.
 *>
-*>    A = U*T*U**T  or  A = L*T*L**T
-*>
+*> Aasen's 2-stage algorithm is used to factor A as
+*>    A = U * T * U**H,  if UPLO = 'U', or
+*>    A = L * T * L**H,  if UPLO = 'L',
 *> where U (or L) is a product of permutation and unit upper (lower)
-*> triangular matrices, and T is a hermitian band matrix with the
-*> bandwidth of NB (NB is internally selected and stored in TB( 1 ), and T is 
-*> LU factorized with partial pivoting).
+*> triangular matrices, and T is Hermitian and band. The matrix T is
+*> then LU-factored with partial pivoting. The factored form of A
+*> is then used to solve the system of equations A * X = B.
 *>
 *> This is the blocked version of the algorithm, calling Level 3 BLAS.
 *> \endverbatim
