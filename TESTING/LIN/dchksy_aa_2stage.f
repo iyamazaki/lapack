@@ -1,4 +1,4 @@
-*> \brief \b DCHKSY_AASEN_2STAGE
+*> \brief \b DCHKSY_AA_2STAGE
 *
 * @precisions fortran d -> s c
 *
@@ -10,7 +10,7 @@
 *  Definition:
 *  ===========
 *
-*       SUBROUTINE DCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, 
+*       SUBROUTINE DCHKSY_AA_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, 
 *                             NNS, NSVAL, THRESH, TSTERR, NMAX, A,
 *                             AFAC, AINV, B, X, XACT, WORK, RWORK,
 *                             IWORK, NOUT )
@@ -33,7 +33,7 @@
 *>
 *> \verbatim
 *>
-*> DCHKSY_AASEN_2STAGE tests DSYTRF_AASEN_2STAGE, -TRS_AASEN_2STAGE.
+*> DCHKSY_AA_2STAGE tests DSYTRF_AA_2STAGE, -TRS_AA_2STAGE.
 *> \endverbatim
 *
 *  Arguments:
@@ -171,7 +171,7 @@
 *> \ingroup double_lin
 *
 *  =====================================================================
-      SUBROUTINE DCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, NNS,
+      SUBROUTINE DCHKSY_AA_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, NNS,
      $                      NSVAL, THRESH, TSTERR, NMAX, A, AFAC, AINV,
      $                      B, X, XACT, WORK, RWORK, IWORK, NOUT )
 *
@@ -221,8 +221,7 @@
 *     .. External Subroutines ..
       EXTERNAL           ALAERH, ALAHD, ALASUM, DERRSY, DLACPY, DLARHS,
      $                   DLATB4, DLATMS, DPOT02, DSYT01, 
-     $                   DSYTRF_AASEN_2STAGE, DSYTRS_AASEN_2STAGE,
-     $                   XLAENV
+     $                   DSYTRF_AA_2STAGE, DSYTRS_AA_2STAGE, XLAENV
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MAX, MIN
@@ -428,13 +427,13 @@
 *                 the block structure of D. AINV is a work array for
 *                 block factorization, LWORK is the length of AINV.
 *
-                  SRNAMT = 'DSYTRF_AASEN_2STAGE'
+                  SRNAMT = 'DSYTRF_AA_2STAGE'
                   LWORK = MIN(N*NB, 3*NMAX*NMAX)
-                  CALL DSYTRF_AASEN_2STAGE( UPLO, N, AFAC, LDA, 
-     $                                      AINV, (3*NB+1)*N, 
-     $                                      IWORK, IWORK( 1+N ),
-     $                                      WORK, LWORK,
-     $                                      INFO )
+                  CALL DSYTRF_AA_2STAGE( UPLO, N, AFAC, LDA, 
+     $                                   AINV, (3*NB+1)*N, 
+     $                                   IWORK, IWORK( 1+N ),
+     $                                   WORK, LWORK,
+     $                                   INFO )
 *
 *                 Adjust the expected value of INFO to account for
 *                 pivoting.
@@ -459,7 +458,7 @@
 *                 Check error code from DSYTRF and handle error.
 *
                   IF( INFO.NE.K ) THEN
-                     CALL ALAERH( PATH, 'DSYTRF_AASEN_2STAGE', INFO, K,
+                     CALL ALAERH( PATH, 'DSYTRF_AA_2STAGE', INFO, K,
      $                            UPLO, N, N, -1, -1, NB, IMAT, NFAIL,
      $                            NERRS, NOUT )
                   END IF
@@ -510,9 +509,9 @@ c                  NT = 1
      $                            B, LDA, ISEED, INFO )
                      CALL DLACPY( 'Full', N, NRHS, B, LDA, X, LDA )
 *
-                     SRNAMT = 'DSYTRS_AASEN_2STAGE'
+                     SRNAMT = 'DSYTRS_AA_2STAGE'
                      LWORK = MAX( 1, 3*N-2 )
-                     CALL DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, AFAC, LDA,
+                     CALL DSYTRS_AA_2STAGE( UPLO, N, NRHS, AFAC, LDA,
      $                            AINV, (3*NB+1)*N, IWORK, IWORK( 1+N ),
      $                            X, LDA, INFO )
 *
@@ -520,7 +519,7 @@ c                  NT = 1
 *
                      IF( INFO.NE.0 ) THEN
                         IF( IZERO.EQ.0 ) THEN
-                           CALL ALAERH( PATH, 'DSYTRS_AASEN_2STAGE',
+                           CALL ALAERH( PATH, 'DSYTRS_AA_2STAGE',
      $                                  INFO, 0, UPLO, N, N, -1, -1,
      $                                  NRHS, IMAT, NFAIL, NERRS, NOUT )
                         END IF
@@ -570,6 +569,6 @@ c                  NT = 1
      $      I6 )
       RETURN
 *
-*     End of DCHKSY_AASEN_2STAGE
+*     End of DCHKSY_AA_2STAGE
 *
       END

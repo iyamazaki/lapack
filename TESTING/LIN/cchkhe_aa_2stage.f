@@ -1,4 +1,4 @@
-*> \brief \b SCHKSY_AASEN_2STAGE
+*> \brief \b CCHKHE_AA_2STAGE
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -8,7 +8,7 @@
 *  Definition:
 *  ===========
 *
-*       SUBROUTINE SCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, 
+*       SUBROUTINE CCHKHE_AA_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, 
 *                             NNS, NSVAL, THRESH, TSTERR, NMAX, A,
 *                             AFAC, AINV, B, X, XACT, WORK, RWORK,
 *                             IWORK, NOUT )
@@ -16,12 +16,12 @@
 *       .. Scalar Arguments ..
 *       LOGICAL            TSTERR
 *       INTEGER            NMAX, NN, NNB, NNS, NOUT
-*       REAL   THRESH
+*       COMPLEX            THRESH
 *       ..
 *       .. Array Arguments ..
 *       LOGICAL            DOTYPE( * )
 *       INTEGER            IWORK( * ), NBVAL( * ), NSVAL( * ), NVAL( * )
-*       REAL               A( * ), AFAC( * ), AINV( * ), B( * ),
+*       COMPLEX            A( * ), AFAC( * ), AINV( * ), B( * ),
 *      $                   RWORK( * ), WORK( * ), X( * ), XACT( * )
 *       ..
 *
@@ -31,7 +31,7 @@
 *>
 *> \verbatim
 *>
-*> SCHKSY_AASEN_2STAGE tests SSYTRF_AASEN_2STAGE, -TRS_AASEN_2STAGE.
+*> DCHKSY_AA_2STAGE tests CHETRF_AA_2STAGE, -TRS_AA_2STAGE.
 *> \endverbatim
 *
 *  Arguments:
@@ -83,7 +83,7 @@
 *>
 *> \param[in] THRESH
 *> \verbatim
-*>          THRESH is REAL
+*>          THRESH is COMPLEX
 *>          The threshold value for the test ratios.  A result is
 *>          included in the output file if RESULT >= THRESH.  To have
 *>          every test ratio printed, use THRESH = 0.
@@ -104,43 +104,43 @@
 *>
 *> \param[out] A
 *> \verbatim
-*>          A is REAL array, dimension (NMAX*NMAX)
+*>          A is COMPLEX array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] AFAC
 *> \verbatim
-*>          AFAC is REAL array, dimension (NMAX*NMAX)
+*>          AFAC is COMPLEX array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] AINV
 *> \verbatim
-*>          AINV is REAL array, dimension (NMAX*NMAX)
+*>          AINV is COMPLEX array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] B
 *> \verbatim
-*>          B is REAL array, dimension (NMAX*NSMAX)
+*>          B is COMPLEX array, dimension (NMAX*NSMAX)
 *>          where NSMAX is the largest entry in NSVAL.
 *> \endverbatim
 *>
 *> \param[out] X
 *> \verbatim
-*>          X is REAL array, dimension (NMAX*NSMAX)
+*>          X is COMPLEX array, dimension (NMAX*NSMAX)
 *> \endverbatim
 *>
 *> \param[out] XACT
 *> \verbatim
-*>          XACT is REAL array, dimension (NMAX*NSMAX)
+*>          XACT is COMPLEX array, dimension (NMAX*NSMAX)
 *> \endverbatim
 *>
 *> \param[out] WORK
 *> \verbatim
-*>          WORK is REAL array, dimension (NMAX*max(3,NSMAX))
+*>          WORK is COMPLEX array, dimension (NMAX*max(3,NSMAX))
 *> \endverbatim
 *>
 *> \param[out] RWORK
 *> \verbatim
-*>          RWORK is REAL array, dimension (max(NMAX,2*NSMAX))
+*>          RWORK is COMPLEX array, dimension (max(NMAX,2*NSMAX))
 *> \endverbatim
 *>
 *> \param[out] IWORK
@@ -164,12 +164,10 @@
 *
 *> \date June 2017
 *
-*  @generated from dsytrf_aasen_2stage.f, fortran d -> s, Mon Oct 30 12:03:46 2017
-*
-*> \ingroup real_lin
+*> \ingroup complex_lin
 *
 *  =====================================================================
-      SUBROUTINE SCHKSY_AASEN_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, NNS,
+      SUBROUTINE CCHKHE_AA_2STAGE( DOTYPE, NN, NVAL, NNB, NBVAL, NNS,
      $                      NSVAL, THRESH, TSTERR, NMAX, A, AFAC, AINV,
      $                      B, X, XACT, WORK, RWORK, IWORK, NOUT )
 *
@@ -183,20 +181,21 @@
 *     .. Scalar Arguments ..
       LOGICAL            TSTERR
       INTEGER            NN, NNB, NNS, NMAX, NOUT
-      REAL   THRESH
+      REAL               THRESH
 *     ..
 *     .. Array Arguments ..
       LOGICAL            DOTYPE( * )
       INTEGER            IWORK( * ), NBVAL( * ), NSVAL( * ), NVAL( * )
-      REAL   A( * ), AFAC( * ), AINV( * ), B( * ),
+      COMPLEX            A( * ), AFAC( * ), AINV( * ), B( * ),
      $                   RWORK( * ), WORK( * ), X( * ), XACT( * )
 *     ..
 *
 *  =====================================================================
 *
 *     .. Parameters ..
-      REAL               ZERO, ONE
-      PARAMETER          ( ZERO = 0.0E+0, ONE = 1.0E+0 )
+      COMPLEX            ZERO, ONE
+      PARAMETER          ( ZERO = ( 0.0E+0, 0.0E+0 ), 
+     $                     ONE  = ( 1.0E+0, 0.0E+0 ) )
       INTEGER            NTYPES
       PARAMETER          ( NTYPES = 10 )
       INTEGER            NTESTS
@@ -209,7 +208,7 @@
       INTEGER            I, I1, I2, IMAT, IN, INB, INFO, IOFF, IRHS,
      $                   IUPLO, IZERO, J, K, KL, KU, LDA, LWORK, MODE,
      $                   N, NB, NERRS, NFAIL, NIMAT, NRHS, NRUN, NT
-      REAL               ANORM, CNDNUM
+      COMPLEX            ANORM, CNDNUM
 *     ..
 *     .. Local Arrays ..
       CHARACTER          UPLOS( 2 )
@@ -217,9 +216,9 @@
       REAL               RESULT( NTESTS )
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           ALAERH, ALAHD, ALASUM, SERRSY, SLACPY, SLARHS,
-     $                   SLATB4, SLATMS, SPOT02, DSYT01, 
-     $                   SSYTRF_AASEN_2STAGE, SSYTRS_AASEN_2STAGE,
+      EXTERNAL           ALAERH, ALAHD, ALASUM, CERRHE, CLACPY, CLARHS,
+     $                   CLATB4, CLATMS, CPOT02, DSYT01, 
+     $                   CHETRF_AA_2STAGE, CHETRS_AA_2STAGE,
      $                   XLAENV
 *     ..
 *     .. Intrinsic Functions ..
@@ -244,13 +243,13 @@
 *
 *     Test path
 *
-      PATH( 1: 1 ) = 'Single precision'
-      PATH( 2: 3 ) = 'SA'
+      PATH( 1: 1 ) = 'Complex precision'
+      PATH( 2: 3 ) = 'HA'
 *
 *     Path to generate matrices
 *
-      MATPATH( 1: 1 ) = 'Single precision'
-      MATPATH( 2: 3 ) = 'SY'
+      MATPATH( 1: 1 ) = 'Complex precision'
+      MATPATH( 2: 3 ) = 'HE'
       NRUN = 0
       NFAIL = 0
       NERRS = 0
@@ -261,7 +260,7 @@
 *     Test the error exits
 *
       IF( TSTERR )
-     $   CALL SERRSY( PATH, NOUT )
+     $   CALL CERRHE( PATH, NOUT )
       INFOT = 0
 *
 *     Set the minimum block size for which the block routine should
@@ -309,23 +308,23 @@
 *              Begin generate the test matrix A.
 *
 *
-*              Set up parameters with SLATB4 for the matrix generator
+*              Set up parameters with CLATB4 for the matrix generator
 *              based on the type of matrix to be generated.
 *
-               CALL SLATB4( MATPATH, IMAT, N, N, TYPE, KL, KU,
+               CALL CLATB4( MATPATH, IMAT, N, N, TYPE, KL, KU,
      $                      ANORM, MODE, CNDNUM, DIST )
 *
-*              Generate a matrix with SLATMS.
+*              Generate a matrix with CLATMS.
 *
-               SRNAMT = 'SLATMS'
-               CALL SLATMS( N, N, DIST, ISEED, TYPE, RWORK, MODE,
+               SRNAMT = 'CLATMS'
+               CALL CLATMS( N, N, DIST, ISEED, TYPE, RWORK, MODE,
      $                      CNDNUM, ANORM, KL, KU, UPLO, A, LDA, WORK,
      $                      INFO )
 *
-*              Check error code from SLATMS and handle error.
+*              Check error code from CLATMS and handle error.
 *
                IF( INFO.NE.0 ) THEN
-                  CALL ALAERH( PATH, 'SLATMS', INFO, 0, UPLO, N, N, -1,
+                  CALL ALAERH( PATH, 'CLATMS', INFO, 0, UPLO, N, N, -1,
      $                         -1, -1, IMAT, NFAIL, NERRS, NOUT )
 *
 *                    Skip all tests for this generated matrix
@@ -419,20 +418,20 @@
 *                 will be factorized in place. This is needed to
 *                 preserve the test matrix A for subsequent tests.
 *
-                  CALL SLACPY( UPLO, N, N, A, LDA, AFAC, LDA )
+                  CALL CLACPY( UPLO, N, N, A, LDA, AFAC, LDA )
 *
 *                 Compute the L*D*L**T or U*D*U**T factorization of the
 *                 matrix. IWORK stores details of the interchanges and
 *                 the block structure of D. AINV is a work array for
 *                 block factorization, LWORK is the length of AINV.
 *
-                  SRNAMT = 'SSYTRF_AASEN_2STAGE'
+                  SRNAMT = 'CHETRF_AA_2STAGE'
                   LWORK = MIN(N*NB, 3*NMAX*NMAX)
-                  CALL SSYTRF_AASEN_2STAGE( UPLO, N, AFAC, LDA, 
-     $                                      AINV, (3*NB+1)*N, 
-     $                                      IWORK, IWORK( 1+N ),
-     $                                      WORK, LWORK,
-     $                                      INFO )
+                  CALL CHETRF_AA_2STAGE( UPLO, N, AFAC, LDA, 
+     $                                   AINV, (3*NB+1)*N, 
+     $                                   IWORK, IWORK( 1+N ),
+     $                                   WORK, LWORK,
+     $                                   INFO )
 *
 *                 Adjust the expected value of INFO to account for
 *                 pivoting.
@@ -454,10 +453,10 @@
                      K = 0
                   END IF
 *
-*                 Check error code from SSYTRF and handle error.
+*                 Check error code from CHETRF and handle error.
 *
                   IF( INFO.NE.K ) THEN
-                     CALL ALAERH( PATH, 'SSYTRF_AASEN_2STAGE', INFO, K,
+                     CALL ALAERH( PATH, 'CHETRF_AA_2STAGE', INFO, K,
      $                            UPLO, N, N, -1, -1, NB, IMAT, NFAIL,
      $                            NERRS, NOUT )
                   END IF
@@ -502,33 +501,33 @@ c                  NT = 1
 *                    Choose a set of NRHS random solution vectors
 *                    stored in XACT and set up the right hand side B
 *
-                     SRNAMT = 'SLARHS'
-                     CALL SLARHS( MATPATH, XTYPE, UPLO, ' ', N, N,
+                     SRNAMT = 'CLARHS'
+                     CALL CLARHS( MATPATH, XTYPE, UPLO, ' ', N, N,
      $                            KL, KU, NRHS, A, LDA, XACT, LDA,
      $                            B, LDA, ISEED, INFO )
-                     CALL SLACPY( 'Full', N, NRHS, B, LDA, X, LDA )
+                     CALL CLACPY( 'Full', N, NRHS, B, LDA, X, LDA )
 *
-                     SRNAMT = 'SSYTRS_AASEN_2STAGE'
+                     SRNAMT = 'CHETRS_AA_2STAGE'
                      LWORK = MAX( 1, 3*N-2 )
-                     CALL SSYTRS_AASEN_2STAGE( UPLO, N, NRHS, AFAC, LDA,
+                     CALL CHETRS_AA_2STAGE( UPLO, N, NRHS, AFAC, LDA,
      $                            AINV, (3*NB+1)*N, IWORK, IWORK( 1+N ),
      $                            X, LDA, INFO )
 *
-*                    Check error code from SSYTRS and handle error.
+*                    Check error code from CHETRS and handle error.
 *
                      IF( INFO.NE.0 ) THEN
                         IF( IZERO.EQ.0 ) THEN
-                           CALL ALAERH( PATH, 'SSYTRS_AASEN_2STAGE',
+                           CALL ALAERH( PATH, 'CHETRS_AA_2STAGE',
      $                                  INFO, 0, UPLO, N, N, -1, -1,
      $                                  NRHS, IMAT, NFAIL, NERRS, NOUT )
                         END IF
                      ELSE
-                        CALL SLACPY( 'Full', N, NRHS, B, LDA, WORK, LDA
+                        CALL CLACPY( 'Full', N, NRHS, B, LDA, WORK, LDA
      $                               )
 *
 *                       Compute the residual for the solution
 *
-                        CALL SPOT02( UPLO, N, NRHS, A, LDA, X, LDA,
+                        CALL CPOT02( UPLO, N, NRHS, A, LDA, X, LDA,
      $                               WORK, LDA, RWORK, RESULT( 2 ) )
 *
 *
@@ -568,6 +567,6 @@ c                  NT = 1
      $      I6 )
       RETURN
 *
-*     End of DCHKSY_AASEN_2STAGE
+*     End of DCHKSY_AA_2STAGE
 *
       END

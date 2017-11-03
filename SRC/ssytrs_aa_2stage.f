@@ -1,6 +1,6 @@
-*> \brief \b DSYTRS_AASEN_2STAGE
+*> \brief \b SSYTRS_AA_2STAGE
 *
-* @precisions fortran d -> s c
+* @generated from SRC/dsytrs_aa_2stage.f, fortran d -> s, Mon Oct 30 11:59:02 2017
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -8,20 +8,20 @@
 *            http://www.netlib.org/lapack/explore-html/
 *
 *> \htmlonly
-*> Download DSYTRS_AASEN_2STAGE + dependencies
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrs_aasen_2stage.f">
+*> Download SSYTRS_AA_2STAGE + dependencies
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/ssytrs_aa_2stage.f">
 *> [TGZ]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrs_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/ssytrs_aa_2stage.f">
 *> [ZIP]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrs_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/ssytrs_aa_2stage.f">
 *> [TXT]</a>
 *> \endhtmlonly
 *
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB, IPIV, 
-*                                      IPIV2, B, LDB, INFO )
+*      SUBROUTINE SSYTRS_AA_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB, IPIV, 
+*                                   IPIV2, B, LDB, INFO )
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
@@ -29,7 +29,7 @@
 *       ..
 *       .. Array Arguments ..
 *       INTEGER            IPIV( * ), IPIV2( * )
-*       DOUBLE PRECISION   A( LDA, * ), TB( * ), B( LDB, * )
+*       REAL               A( LDA, * ), TB( * ), B( LDB, * )
 *       ..
 *
 *> \par Purpose:
@@ -37,9 +37,9 @@
 *>
 *> \verbatim
 *>
-*> DSYTRS_AASEN_2STAGE solves a system of linear equations A*X = B with a real
+*> SSYTRS_AA_2STAGE solves a system of linear equations A*X = B with a real
 *> symmetric matrix A using the factorization A = U*T*U**T or
-*> A = L*T*L**T computed by DSYTRF_AASEN_2STAGE.
+*> A = L*T*L**T computed by SSYTRF_AA_2STAGE.
 *> \endverbatim
 *
 *  Arguments:
@@ -69,8 +69,8 @@
 *>
 *> \param[in] A
 *> \verbatim
-*>          A is DOUBLE PRECISION array, dimension (LDA,N)
-*>          Details of factors computed by DSYTRF_AASEN_2STAGE.
+*>          A is REAL array, dimension (LDA,N)
+*>          Details of factors computed by SSYTRF_AA_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] LDA
@@ -81,8 +81,8 @@
 *>
 *> \param[out] TB
 *> \verbatim
-*>          TB is DOUBLE PRECISION array, dimension (LTB)
-*>          Details of factors computed by DSYTRF_AASEN_2STAGE.
+*>          TB is REAL array, dimension (LTB)
+*>          Details of factors computed by SSYTRF_AA_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] LTB
@@ -94,19 +94,19 @@
 *> \verbatim
 *>          IPIV is INTEGER array, dimension (N)
 *>          Details of the interchanges as computed by
-*>          DSYTRF_AASEN_2STAGE.
+*>          SSYTRF_AA_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] IPIV2
 *> \verbatim
 *>          IPIV2 is INTEGER array, dimension (N)
 *>          Details of the interchanges as computed by
-*>          DSYTRF_AASEN_2STAGE.
+*>          SSYTRF_AA_2STAGE.
 *> \endverbatim
 *>
 *> \param[in,out] B
 *> \verbatim
-*>          B is DOUBLE PRECISION array, dimension (LDB,NRHS)
+*>          B is REAL array, dimension (LDB,NRHS)
 *>          On entry, the right hand side matrix B.
 *>          On exit, the solution matrix X.
 *> \endverbatim
@@ -134,11 +134,11 @@
 *
 *> \date June 2017
 *
-*> \ingroup doubleSYcomputational
+*> \ingroup realSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
-     $                                IPIV, IPIV2, B, LDB, INFO )
+      SUBROUTINE SSYTRS_AA_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
+     $                             IPIV, IPIV2, B, LDB, INFO )
 *
 *  -- LAPACK computational routine (version 3.7.1) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -153,13 +153,13 @@
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
-      DOUBLE PRECISION   A( LDA, * ), TB( * ), B( LDB, * )
+      REAL               A( LDA, * ), TB( * ), B( LDB, * )
 *     ..
 *
 *  =====================================================================
 *
-      DOUBLE PRECISION   ONE
-      PARAMETER          ( ONE = 1.0D+0 )
+      REAL               ONE
+      PARAMETER          ( ONE = 1.0E+0 )
 *     ..
 *     .. Local Scalars ..
       INTEGER            LDTB, NB
@@ -170,7 +170,7 @@
       EXTERNAL           LSAME
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DGBTRS, DLASWP, DTRSM, XERBLA
+      EXTERNAL           SGBTRS, SLASWP, STRSM, XERBLA
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MAX
@@ -193,7 +193,7 @@
          INFO = -11
       END IF
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DSYTRS_AASEN_2STAGE', -INFO )
+         CALL XERBLA( 'SSYTRS_AA_2STAGE', -INFO )
          RETURN
       END IF
 *
@@ -215,29 +215,29 @@
 *
 *           Pivot, P**T * B
 *
-            CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
+            CALL SLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
 *
 *           Compute (U**T \P**T * B) -> B    [ (U**T \P**T * B) ]
 *
-            CALL DTRSM( 'L', 'U', 'T', 'U', N-NB, NRHS, ONE, A(1, NB+1),
+            CALL STRSM( 'L', 'U', 'T', 'U', N-NB, NRHS, ONE, A(1, NB+1),
      $                 LDA, B(NB+1, 1), LDB)
 *
          END IF
 *
 *        Compute T \ B -> B   [ T \ (U**T \P**T * B) ]
 *
-         CALL DGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
+         CALL SGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
      $               INFO)
          IF( N.GT.NB ) THEN
 *
 *           Compute (U \ B) -> B   [ U \ (T \ (U**T \P**T * B) ) ]
 *
-            CALL DTRSM( 'L', 'U', 'N', 'U', N-NB, NRHS, ONE, A(1, NB+1),
+            CALL STRSM( 'L', 'U', 'N', 'U', N-NB, NRHS, ONE, A(1, NB+1),
      $                  LDA, B(NB+1, 1), LDB)
 *
 *           Pivot, P * B  [ P * (U \ (T \ (U**T \P**T * B) )) ]
 *
-            CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
+            CALL SLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
 *
          END IF
 *
@@ -249,35 +249,35 @@
 *
 *           Pivot, P**T * B
 *
-            CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
+            CALL SLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
 *
 *           Compute (L \P**T * B) -> B    [ (L \P**T * B) ]
 *
-            CALL DTRSM( 'L', 'L', 'N', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
+            CALL STRSM( 'L', 'L', 'N', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
      $                 LDA, B(NB+1, 1), LDB)
 *
          END IF
 *
 *        Compute T \ B -> B   [ T \ (L \P**T * B) ]
 *
-         CALL DGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
+         CALL SGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
      $               INFO)
          IF( N.GT.NB ) THEN
 *
 *           Compute (L**T \ B) -> B   [ L**T \ (T \ (L \P**T * B) ) ]
 *
-            CALL DTRSM( 'L', 'L', 'T', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
+            CALL STRSM( 'L', 'L', 'T', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
      $                  LDA, B(NB+1, 1), LDB)
 *
 *           Pivot, P * B  [ P * (L**T \ (T \ (L \P**T * B) )) ]
 *
-            CALL DLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
+            CALL SLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
 *
          END IF
       END IF
 *
       RETURN
 *
-*     End of DSYTRS_AASEN_2STAGE
+*     End of SSYTRS_AA_2STAGE
 *
       END

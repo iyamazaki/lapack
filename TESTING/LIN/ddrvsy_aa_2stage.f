@@ -1,6 +1,6 @@
-*> \brief \b CDRVHE_AASEN_2STAGE
+*> \brief \b DDRVSY_AA_2STAGE
 *
-* @generated from chetrf.f, fortran c -> s, Tue Oct 31 11:25:04 2017
+* @generated from cdrvhe_aa_2stage.f, fortran c -> d, Tue Oct 31 11:25:04 2017
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -10,7 +10,7 @@
 *  Definition:
 *  ===========
 *
-*       SUBROUTINE CDRVHE_AASEN_2STAGE(
+*       SUBROUTINE DDRVSY_AA_2STAGE(
 *                             DOTYPE, NN, NVAL, NRHS, THRESH, TSTERR, NMAX,
 *                             A, AFAC, AINV, B, X, XACT, WORK, RWORK, IWORK,
 *                             NOUT )
@@ -18,13 +18,13 @@
 *       .. Scalar Arguments ..
 *       LOGICAL            TSTERR
 *       INTEGER            NMAX, NN, NOUT, NRHS
-*       REAL               THRESH
+*       DOUBLE PRECISION   THRESH
 *       ..
 *       .. Array Arguments ..
 *       LOGICAL            DOTYPE( * )
 *       INTEGER            IWORK( * ), NVAL( * )
-*       REAL               RWORK( * )
-*       REAL               A( * ), AFAC( * ), AINV( * ), B( * ),
+*       DOUBLE PRECISION   RWORK( * )
+*       DOUBLE PRECISION   A( * ), AFAC( * ), AINV( * ), B( * ),
 *      $                   WORK( * ), X( * ), XACT( * )
 *       ..
 *
@@ -34,7 +34,7 @@
 *>
 *> \verbatim
 *>
-*> CDRVHE_AASEN_2STAGE tests the driver routine SSYSV_AASEN_2STAGE.
+*> DDRVSY_AA_2STAGE tests the driver routine DSYSV_AA_2STAGE.
 *> \endverbatim
 *
 *  Arguments:
@@ -69,7 +69,7 @@
 *>
 *> \param[in] THRESH
 *> \verbatim
-*>          THRESH is REAL
+*>          THRESH is DOUBLE PRECISION
 *>          The threshold value for the test ratios.  A result is
 *>          included in the output file if RESULT >= THRESH.  To have
 *>          every test ratio printed, use THRESH = 0.
@@ -90,42 +90,42 @@
 *>
 *> \param[out] A
 *> \verbatim
-*>          A is REAL array, dimension (NMAX*NMAX)
+*>          A is DOUBLE PRECISION array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] AFAC
 *> \verbatim
-*>          AFAC is REAL array, dimension (NMAX*NMAX)
+*>          AFAC is DOUBLE PRECISION array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] AINV
 *> \verbatim
-*>          AINV is REAL array, dimension (NMAX*NMAX)
+*>          AINV is DOUBLE PRECISION array, dimension (NMAX*NMAX)
 *> \endverbatim
 *>
 *> \param[out] B
 *> \verbatim
-*>          B is REAL array, dimension (NMAX*NRHS)
+*>          B is DOUBLE PRECISION array, dimension (NMAX*NRHS)
 *> \endverbatim
 *>
 *> \param[out] X
 *> \verbatim
-*>          X is REAL array, dimension (NMAX*NRHS)
+*>          X is DOUBLE PRECISION array, dimension (NMAX*NRHS)
 *> \endverbatim
 *>
 *> \param[out] XACT
 *> \verbatim
-*>          XACT is REAL array, dimension (NMAX*NRHS)
+*>          XACT is DOUBLE PRECISION array, dimension (NMAX*NRHS)
 *> \endverbatim
 *>
 *> \param[out] WORK
 *> \verbatim
-*>          WORK is REAL array, dimension (NMAX*max(2,NRHS))
+*>          WORK is DOUBLE PRECISION array, dimension (NMAX*max(2,NRHS))
 *> \endverbatim
 *>
 *> \param[out] RWORK
 *> \verbatim
-*>          RWORK is REAL array, dimension (NMAX+2*NRHS)
+*>          RWORK is DOUBLE PRECISION array, dimension (NMAX+2*NRHS)
 *> \endverbatim
 *>
 *> \param[out] IWORK
@@ -149,10 +149,10 @@
 *
 *> \date December 2016
 *
-*> \ingroup real_lin
+*> \ingroup double_lin
 *
 *  =====================================================================
-      SUBROUTINE SDRVSY_AASEN_2STAGE(
+      SUBROUTINE DDRVSY_AA_2STAGE(
      $                         DOTYPE, NN, NVAL, NRHS, THRESH, TSTERR,
      $                         NMAX, A, AFAC, AINV, B, X, XACT, WORK,
      $                         RWORK, IWORK, NOUT )
@@ -165,21 +165,21 @@
 *     .. Scalar Arguments ..
       LOGICAL            TSTERR
       INTEGER            NMAX, NN, NOUT, NRHS
-      REAL               THRESH
+      DOUBLE PRECISION               THRESH
 *     ..
 *     .. Array Arguments ..
       LOGICAL            DOTYPE( * )
       INTEGER            IWORK( * ), NVAL( * )
-      REAL               RWORK( * )
-      REAL               A( * ), AFAC( * ), AINV( * ), B( * ),
+      DOUBLE PRECISION   RWORK( * )
+      DOUBLE PRECISION   A( * ), AFAC( * ), AINV( * ), B( * ),
      $                   WORK( * ), X( * ), XACT( * )
 *     ..
 *
 *  =====================================================================
 *
 *     .. Parameters ..
-      REAL               ONE, ZERO
-      PARAMETER          ( ONE = 1.0E+0, ZERO = 0.0E+0 )
+      DOUBLE PRECISION   ONE, ZERO
+      PARAMETER          ( ONE = 1.0D+0, ZERO = 0.0D+0 )
       INTEGER            NTYPES, NTESTS
       PARAMETER          ( NTYPES = 10, NTESTS = 3 )
       INTEGER            NFACT
@@ -192,22 +192,22 @@
       INTEGER            I, I1, I2, IFACT, IMAT, IN, INFO, IOFF, IUPLO,
      $                   IZERO, J, K, KL, KU, LDA, LWORK, MODE, N,
      $                   NB, NBMIN, NERRS, NFAIL, NIMAT, NRUN, NT
-      REAL               ANORM, CNDNUM
+      DOUBLE PRECISION   ANORM, CNDNUM
 *     ..
 *     .. Local Arrays ..
       CHARACTER          FACTS( NFACT ), UPLOS( 2 )
       INTEGER            ISEED( 4 ), ISEEDY( 4 )
-      REAL               RESULT( NTESTS )
+      DOUBLE PRECISION   RESULT( NTESTS )
 *     ..
 *     .. External Functions ..
-      REAL               SLANSY, SGET06
-      EXTERNAL           SLANSY, SGET06
+      DOUBLE PRECISION   DLANSY, SGET06
+      EXTERNAL           DLANSY, SGET06
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           ALADHD, ALAERH, ALASVM, XLAENV, SERRVX,
-     $                   CGET04, SLACPY, SLARHS, SLATB4, SLATMS,
-     $                   SSYSV_AASEN_2STAGE, SSYT01_AA, SPOT02,
-     $                   SSYTRF_AASEN_2STAGE
+      EXTERNAL           ALADHD, ALAERH, ALASVM, XLAENV, DERRVX,
+     $                   DGET04, DLACPY, DLARHS, DLATB4, DLATMS,
+     $                   DSYSV_AA_2STAGE, CHET01_AA, DPOT02,
+     $                   DSYTRF_AA_2STAGE
 *     ..
 *     .. Scalars in Common ..
       LOGICAL            LERR, OK
@@ -231,12 +231,12 @@
 *
 *     Test path
 *
-      PATH( 1: 1 ) = 'Single precision'
+      PATH( 1: 1 ) = 'Double precision'
       PATH( 2: 3 ) = 'SY'
 *
 *     Path to generate matrices
 *
-      MATPATH( 1: 1 ) = 'Single precision'
+      MATPATH( 1: 1 ) = 'Double precision'
       MATPATH( 2: 3 ) = 'SY'
 *
       NRUN = 0
@@ -249,7 +249,7 @@
 *     Test the error exits
 *
       IF( TSTERR )
-     $   CALL SERRVX( PATH, NOUT )
+     $   CALL DERRVX( PATH, NOUT )
       INFOT = 0
 *
 *     Set the block size and minimum block size for testing.
@@ -289,23 +289,23 @@
 *
 *              Begin generate the test matrix A.
 *
-*              Set up parameters with SLATB4 for the matrix generator
+*              Set up parameters with DLATB4 for the matrix generator
 *              based on the type of matrix to be generated.
 *
-              CALL SLATB4( MATPATH, IMAT, N, N, TYPE, KL, KU, ANORM,
+              CALL DLATB4( MATPATH, IMAT, N, N, TYPE, KL, KU, ANORM,
      $                         MODE, CNDNUM, DIST )
 *
-*              Generate a matrix with SLATMS.
+*              Generate a matrix with DLATMS.
 *
-                  SRNAMT = 'SLATMS'
-                  CALL SLATMS( N, N, DIST, ISEED, TYPE, RWORK, MODE,
+                  SRNAMT = 'DLATMS'
+                  CALL DLATMS( N, N, DIST, ISEED, TYPE, RWORK, MODE,
      $                         CNDNUM, ANORM, KL, KU, UPLO, A, LDA,
      $                         WORK, INFO )
 *
-*                 Check error code from SLATMS and handle error.
+*                 Check error code from DLATMS and handle error.
 *
                   IF( INFO.NE.0 ) THEN
-                     CALL ALAERH( PATH, 'SLATMS', INFO, 0, UPLO, N, N,
+                     CALL ALAERH( PATH, 'DLATMS', INFO, 0, UPLO, N, N,
      $                            -1, -1, -1, IMAT, NFAIL, NERRS, NOUT )
                      GO TO 160
                   END IF
@@ -390,23 +390,23 @@
 *
 *                 Form an exact solution and set the right hand side.
 *
-                  SRNAMT = 'SLARHS'
-                  CALL SLARHS( MATPATH, XTYPE, UPLO, ' ', N, N, KL, KU,
+                  SRNAMT = 'DLARHS'
+                  CALL DLARHS( MATPATH, XTYPE, UPLO, ' ', N, N, KL, KU,
      $                         NRHS, A, LDA, XACT, LDA, B, LDA, ISEED,
      $                         INFO )
                   XTYPE = 'C'
 *
-*                 --- Test SSYSV_AASEN_2STAGE  ---
+*                 --- Test DSYSV_AA_2STAGE  ---
 *
                   IF( IFACT.EQ.2 ) THEN
-                     CALL SLACPY( UPLO, N, N, A, LDA, AFAC, LDA )
-                     CALL SLACPY( 'Full', N, NRHS, B, LDA, X, LDA )
+                     CALL DLACPY( UPLO, N, N, A, LDA, AFAC, LDA )
+                     CALL DLACPY( 'Full', N, NRHS, B, LDA, X, LDA )
 *
-*                    Factor the matrix and solve the system using SSYSV_AA.
+*                    Factor the matrix and solve the system using DSYSV_AA.
 *
-                     SRNAMT = 'SSYSV_AASEN_2STAGE '
+                     SRNAMT = 'DSYSV_AA_2STAGE '
                      LWORK = MIN(N*NB, 3*NMAX*NMAX)
-                     CALL SSYSV_AASEN_2STAGE( UPLO, N, NRHS, AFAC, LDA,
+                     CALL DSYSV_AA_2STAGE( UPLO, N, NRHS, AFAC, LDA,
      $                                 AINV, (3*NB+1)*N, 
      $                                 IWORK, IWORK( 1+N ),
      $                                 X, LDA, WORK, LWORK, INFO )
@@ -431,10 +431,10 @@
                         K = 0
                      END IF
 *
-*                    Check error code from SSYSV_AA .
+*                    Check error code from DSYSV_AA .
 *
                      IF( INFO.NE.K ) THEN
-                        CALL ALAERH( PATH, 'SSYSV_AA', INFO, K,
+                        CALL ALAERH( PATH, 'DSYSV_AA', INFO, K,
      $                               UPLO, N, N, -1, -1, NRHS,
      $                               IMAT, NFAIL, NERRS, NOUT )
                         GO TO 120
@@ -444,14 +444,14 @@
 *
 *                    Compute residual of the computed solution.
 *
-                     CALL SLACPY( 'Full', N, NRHS, B, LDA, WORK, LDA )
-                     CALL SPOT02( UPLO, N, NRHS, A, LDA, X, LDA, WORK,
+                     CALL DLACPY( 'Full', N, NRHS, B, LDA, WORK, LDA )
+                     CALL DPOT02( UPLO, N, NRHS, A, LDA, X, LDA, WORK,
      $                            LDA, RWORK, RESULT( 1 ) )
 *
 *                    Reconstruct matrix from factors and compute
 *                    residual.
 *
-c                     CALL SSY01_AA( UPLO, N, A, LDA, AFAC, LDA,
+c                     CALL CHET01_AA( UPLO, N, A, LDA, AFAC, LDA,
 c     $                                  IWORK, AINV, LDA, RWORK,
 c     $                                  RESULT( 2 ) )
 c                     NT = 2
@@ -464,7 +464,7 @@ c                     NT = 2
                         IF( RESULT( K ).GE.THRESH ) THEN
                            IF( NFAIL.EQ.0 .AND. NERRS.EQ.0 )
      $                        CALL ALADHD( NOUT, PATH )
-                           WRITE( NOUT, FMT = 9999 )'SSYSV_AA ',
+                           WRITE( NOUT, FMT = 9999 )'DSYSV_AA ',
      $                         UPLO, N, IMAT, K, RESULT( K )
                            NFAIL = NFAIL + 1
                         END IF
@@ -487,6 +487,6 @@ c                     NT = 2
      $      ', test ', I2, ', ratio =', G12.5 )
       RETURN
 *
-*     End of CDRVHE_AA
+*     End of DDRVSY_AA_2STAGE
 *
       END

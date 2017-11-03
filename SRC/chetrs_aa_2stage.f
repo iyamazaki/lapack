@@ -1,6 +1,6 @@
-*> \brief \b SSYTRS_AASEN_2STAGE
+*> \brief \b CHETRS_AA_2STAGE
 *
-* @generated from SRC/dsytrs_aasen_2stage.f, fortran d -> s, Mon Oct 30 11:59:02 2017
+* @generated from SRC/dsytrs_aa_2stage.f, fortran d -> c, Mon Oct 30 11:59:02 2017
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -8,20 +8,20 @@
 *            http://www.netlib.org/lapack/explore-html/
 *
 *> \htmlonly
-*> Download SSYTRS_AASEN_2STAGE + dependencies
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/ssytrs_aasen_2stage.f">
+*> Download CHETRS_AA_2STAGE + dependencies
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/chetrs_aa_2stage.f">
 *> [TGZ]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/ssytrs_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/chetrs_aa_2stage.f">
 *> [ZIP]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/ssytrs_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/chetrs_aa_2stage.f">
 *> [TXT]</a>
 *> \endhtmlonly
 *
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE SSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB, IPIV, 
-*                                      IPIV2, B, LDB, INFO )
+*      SUBROUTINE CHETRS_AA_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB, IPIV, 
+*                                   IPIV2, B, LDB, INFO )
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
@@ -29,7 +29,7 @@
 *       ..
 *       .. Array Arguments ..
 *       INTEGER            IPIV( * ), IPIV2( * )
-*       REAL               A( LDA, * ), TB( * ), B( LDB, * )
+*       COMPLEX            A( LDA, * ), TB( * ), B( LDB, * )
 *       ..
 *
 *> \par Purpose:
@@ -37,9 +37,9 @@
 *>
 *> \verbatim
 *>
-*> SSYTRS_AASEN_2STAGE solves a system of linear equations A*X = B with a real
-*> symmetric matrix A using the factorization A = U*T*U**T or
-*> A = L*T*L**T computed by SSYTRF_AASEN_2STAGE.
+*> CHETRS_AA_2STAGE solves a system of linear equations A*X = B with a real
+*> hermitian matrix A using the factorization A = U*T*U**T or
+*> A = L*T*L**T computed by CHETRF_AA_2STAGE.
 *> \endverbatim
 *
 *  Arguments:
@@ -69,8 +69,8 @@
 *>
 *> \param[in] A
 *> \verbatim
-*>          A is REAL array, dimension (LDA,N)
-*>          Details of factors computed by SSYTRF_AASEN_2STAGE.
+*>          A is COMPLEX array, dimension (LDA,N)
+*>          Details of factors computed by CHETRF_AA_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] LDA
@@ -81,8 +81,8 @@
 *>
 *> \param[out] TB
 *> \verbatim
-*>          TB is REAL array, dimension (LTB)
-*>          Details of factors computed by SSYTRF_AASEN_2STAGE.
+*>          TB is COMPLEX array, dimension (LTB)
+*>          Details of factors computed by CHETRF_AA_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] LTB
@@ -94,19 +94,19 @@
 *> \verbatim
 *>          IPIV is INTEGER array, dimension (N)
 *>          Details of the interchanges as computed by
-*>          SSYTRF_AASEN_2STAGE.
+*>          CHETRF_AA_2STAGE.
 *> \endverbatim
 *>
 *> \param[in] IPIV2
 *> \verbatim
 *>          IPIV2 is INTEGER array, dimension (N)
 *>          Details of the interchanges as computed by
-*>          SSYTRF_AASEN_2STAGE.
+*>          CHETRF_AA_2STAGE.
 *> \endverbatim
 *>
 *> \param[in,out] B
 *> \verbatim
-*>          B is REAL array, dimension (LDB,NRHS)
+*>          B is COMPLEX array, dimension (LDB,NRHS)
 *>          On entry, the right hand side matrix B.
 *>          On exit, the solution matrix X.
 *> \endverbatim
@@ -134,11 +134,11 @@
 *
 *> \date June 2017
 *
-*> \ingroup realSYcomputational
+*> \ingroup complexSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE SSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
-     $                                IPIV, IPIV2, B, LDB, INFO )
+      SUBROUTINE CHETRS_AA_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
+     $                             IPIV, IPIV2, B, LDB, INFO )
 *
 *  -- LAPACK computational routine (version 3.7.1) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -153,13 +153,13 @@
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
-      REAL               A( LDA, * ), TB( * ), B( LDB, * )
+      COMPLEX            A( LDA, * ), TB( * ), B( LDB, * )
 *     ..
 *
 *  =====================================================================
 *
-      REAL               ONE
-      PARAMETER          ( ONE = 1.0E+0 )
+      COMPLEX            ONE
+      PARAMETER          ( ONE = ( 1.0E+0, 0.0E+0 ) )
 *     ..
 *     .. Local Scalars ..
       INTEGER            LDTB, NB
@@ -170,7 +170,7 @@
       EXTERNAL           LSAME
 *     ..
 *     .. External Subroutines ..
-      EXTERNAL           DGBTRS, SLASWP, STRSM, XERBLA
+      EXTERNAL           CGBTRS, CLASWP, CTRSM, XERBLA
 *     ..
 *     .. Intrinsic Functions ..
       INTRINSIC          MAX
@@ -193,7 +193,7 @@
          INFO = -11
       END IF
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'SSYTRS_AASEN_2STAGE', -INFO )
+         CALL XERBLA( 'CHETRS_AA_2STAGE', -INFO )
          RETURN
       END IF
 *
@@ -215,29 +215,29 @@
 *
 *           Pivot, P**T * B
 *
-            CALL SLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
+            CALL CLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
 *
 *           Compute (U**T \P**T * B) -> B    [ (U**T \P**T * B) ]
 *
-            CALL STRSM( 'L', 'U', 'T', 'U', N-NB, NRHS, ONE, A(1, NB+1),
+            CALL CTRSM( 'L', 'U', 'C', 'U', N-NB, NRHS, ONE, A(1, NB+1),
      $                 LDA, B(NB+1, 1), LDB)
 *
          END IF
 *
 *        Compute T \ B -> B   [ T \ (U**T \P**T * B) ]
 *
-         CALL SGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
+         CALL CGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
      $               INFO)
          IF( N.GT.NB ) THEN
 *
 *           Compute (U \ B) -> B   [ U \ (T \ (U**T \P**T * B) ) ]
 *
-            CALL STRSM( 'L', 'U', 'N', 'U', N-NB, NRHS, ONE, A(1, NB+1),
+            CALL CTRSM( 'L', 'U', 'N', 'U', N-NB, NRHS, ONE, A(1, NB+1),
      $                  LDA, B(NB+1, 1), LDB)
 *
 *           Pivot, P * B  [ P * (U \ (T \ (U**T \P**T * B) )) ]
 *
-            CALL SLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
+            CALL CLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
 *
          END IF
 *
@@ -249,35 +249,35 @@
 *
 *           Pivot, P**T * B
 *
-            CALL SLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
+            CALL CLASWP( NRHS, B, LDB, NB+1, N, IPIV, 1 )
 *
 *           Compute (L \P**T * B) -> B    [ (L \P**T * B) ]
 *
-            CALL STRSM( 'L', 'L', 'N', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
+            CALL CTRSM( 'L', 'L', 'N', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
      $                 LDA, B(NB+1, 1), LDB)
 *
          END IF
 *
 *        Compute T \ B -> B   [ T \ (L \P**T * B) ]
 *
-         CALL SGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
+         CALL CGBTRS( 'N', N, NB, NB, NRHS, TB, LDTB, IPIV2, B, LDB,
      $               INFO)
          IF( N.GT.NB ) THEN
 *
 *           Compute (L**T \ B) -> B   [ L**T \ (T \ (L \P**T * B) ) ]
 *
-            CALL STRSM( 'L', 'L', 'T', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
+            CALL CTRSM( 'L', 'L', 'C', 'U', N-NB, NRHS, ONE, A(NB+1, 1),
      $                  LDA, B(NB+1, 1), LDB)
 *
 *           Pivot, P * B  [ P * (L**T \ (T \ (L \P**T * B) )) ]
 *
-            CALL SLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
+            CALL CLASWP( NRHS, B, LDB, NB+1, N, IPIV, -1 )
 *
          END IF
       END IF
 *
       RETURN
 *
-*     End of SSYTRS_AASEN_2STAGE
+*     End of CHETRS_AA_2STAGE
 *
       END

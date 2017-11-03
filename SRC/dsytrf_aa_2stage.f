@@ -1,4 +1,4 @@
-*> \brief \b DSYTRF_AASEN_2STAGE
+*> \brief \b DSYTRF_AA_2STAGE
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -6,20 +6,20 @@
 *            http://www.netlib.org/lapack/explore-html/
 *
 *> \htmlonly
-*> Download DSYTRF_AASEN_2STAGE + dependencies
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrf_aasen_2stage.f">
+*> Download DSYTRF_AA_2STAGE + dependencies
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsytrf_aa_2stage.f">
 *> [TGZ]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrf_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsytrf_aa_2stage.f">
 *> [ZIP]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrf_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsytrf_aa_2stage.f">
 *> [TXT]</a>
 *> \endhtmlonly
 *
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE DSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV,
-*                                      IPIV2, WORK, LWORK, INFO )
+*      SUBROUTINE DSYTRF_AA_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV,
+*                                   IPIV2, WORK, LWORK, INFO )
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
@@ -35,7 +35,7 @@
 *>
 *> \verbatim
 *>
-*> DSYTRF_AASEN_2STAGE computes the factorization of a real symmetric matrix A
+*> DSYTRF_AA_2STAGE computes the factorization of a real symmetric matrix A
 *> using the Aasen's algorithm.  The form of the factorization is
 *>
 *>    A = U*T*U**T  or  A = L*T*L**T
@@ -155,8 +155,8 @@
 *> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE DSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV,
-     $                                IPIV2, WORK, LWORK, INFO )
+      SUBROUTINE DSYTRF_AA_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV,
+     $                             IPIV2, WORK, LWORK, INFO )
 *
 *  -- LAPACK computational routine (version 3.7.0) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -217,13 +217,13 @@
       END IF
 *
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'DSYTRF_AASEN_2STAGE', -INFO )
+         CALL XERBLA( 'DSYTRF_AA_2STAGE', -INFO )
          RETURN
       END IF
 *
 *     Answer the query
 *
-      NB = ILAENV( 1, 'DSYTRF_AASEN_2STAGE', UPLO, N, -1, -1, -1 )
+      NB = ILAENV( 1, 'DSYTRF_AA_2STAGE', UPLO, N, -1, -1, -1 )
       IF( INFO.EQ.0 ) THEN
          IF( TQUERY ) THEN
             TB( 1 ) = (3*NB+1)*N
@@ -636,6 +636,6 @@ c     $                     (J+1)*NB+1, (J+1)*NB+KB, IPIV, 1 )
 *     Factor the band matrix
       CALL DGBTRF( N, N, NB, NB, TB, LDTB, IPIV2, INFO )
 *
-*     End of DSYTRF_AASEN_2STAGE
+*     End of DSYTRF_AA_2STAGE
 *
       END

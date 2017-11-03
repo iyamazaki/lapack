@@ -1,6 +1,6 @@
-*> \brief <b> SSYSV_AASEN_2STAGE computes the solution to system of linear equations A * X = B for SY matrices</b>
+*> \brief <b> DSYSV_AA_2STAGE computes the solution to system of linear equations A * X = B for SY matrices</b>
 *
-* @generated from SRC/chesv_aasen_2stage.f, fortran c -> s, Tue Oct 31 11:22:31 2017
+* @generated from SRC/chesv_aa_2stage.f, fortran c -> d, Tue Oct 31 11:22:31 2017
 *
 *  =========== DOCUMENTATION ===========
 *
@@ -8,21 +8,21 @@
 *            http://www.netlib.org/lapack/explore-html/
 *
 *> \htmlonly
-*> Download SSYSV_AASEN_2STAGE + dependencies
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/ssysv_aasen_2stage.f">
+*> Download DSYSV_AA_2STAGE + dependencies
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsysv_aa_2stage.f">
 *> [TGZ]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/ssysv_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsysv_aa_2stage.f">
 *> [ZIP]</a>
-*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/ssysv_aasen_2stage.f">
+*> <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsysv_aa_2stage.f">
 *> [TXT]</a>
 *> \endhtmlonly
 *
 *  Definition:
 *  ===========
 *
-*      SUBROUTINE SSYSV_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
-*                                     IPIV, IPIV2, B, LDB, WORK, LWORK,
-*                                     INFO )
+*      SUBROUTINE DSYSV_AA_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
+*                                  IPIV, IPIV2, B, LDB, WORK, LWORK,
+*                                  INFO )
 *
 *       .. Scalar Arguments ..
 *       CHARACTER          UPLO
@@ -30,7 +30,7 @@
 *       ..
 *       .. Array Arguments ..
 *       INTEGER            IPIV( * ), IPIV2( * )
-*       REAL               A( LDA, * ), TB( * ), B( LDB, *), WORK( * )
+*       DOUBLE PRECISION   A( LDA, * ), TB( * ), B( LDB, *), WORK( * )
 *       ..
 *
 *> \par Purpose:
@@ -38,7 +38,7 @@
 *>
 *> \verbatim
 *>
-*> SSYSV_AASEN_2STAGE computes the solution to a complex system of
+*> DSYSV_AA_2STAGE computes the solution to a complex system of
 *> linear equations
 *>    A * X = B,
 *> where A is an N-by-N symmetric matrix and X and B are N-by-NRHS
@@ -80,7 +80,7 @@
 *>
 *> \param[in,out] A
 *> \verbatim
-*>          A is REAL array, dimension (LDA,N)
+*>          A is DOUBLE PRECISION array, dimension (LDA,N)
 *>          On entry, the symmetric matrix A.  If UPLO = 'U', the leading
 *>          N-by-N upper triangular part of A contains the upper
 *>          triangular part of the matrix A, and the strictly lower
@@ -101,7 +101,7 @@
 *>
 *> \param[out] TB
 *> \verbatim
-*>          TB is REAL array, dimension (LTB)
+*>          TB is DOUBLE PRECISION array, dimension (LTB)
 *>          On exit, details of the LU factorization of the band matrix.
 *> \endverbatim
 *>
@@ -134,7 +134,7 @@
 *>
 *> \param[in,out] B
 *> \verbatim
-*>          B is REAL array, dimension (LDB,NRHS)
+*>          B is DOUBLE PRECISION array, dimension (LDB,NRHS)
 *>          On entry, the right hand side matrix B.
 *>          On exit, the solution matrix X.
 *> \endverbatim
@@ -147,7 +147,7 @@
 *>
 *> \param[out] WORK
 *> \verbatim
-*>          WORK is REAL workspace of size LWORK
+*>          WORK is DOUBLE PRECISION workspace of size LWORK
 *> \endverbatim
 *>
 *> \param[in] LWORK
@@ -179,12 +179,12 @@
 *
 *> \date December 2016
 *
-*> \ingroup realSYcomputational
+*> \ingroup doubleSYcomputational
 *
 *  =====================================================================
-      SUBROUTINE SSYSV_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
-     $                               IPIV, IPIV2, B, LDB, WORK, LWORK,
-     $                               INFO )
+      SUBROUTINE DSYSV_AA_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB,
+     $                            IPIV, IPIV2, B, LDB, WORK, LWORK,
+     $                            INFO )
 *
 *  -- LAPACK computational routine (version 3.7.0) --
 *  -- LAPACK is a software package provided by Univ. of Tennessee,    --
@@ -199,20 +199,20 @@
 *     ..
 *     .. Array Arguments ..
       INTEGER            IPIV( * ), IPIV2( * )
-      REAL               A( LDA, * ), B( LDB, * ), TB( * ), WORK( * )
+      DOUBLE PRECISION   A( LDA, * ), B( LDB, * ), TB( * ), WORK( * )
 *     ..
 *
 *  =====================================================================
 *     .. Parameters ..
-      REAL               ZERO, ONE
-      PARAMETER          ( ZERO = ( 0.0E+0, 0.0E+0 ),
-     $                     ONE  = ( 1.0E+0, 0.0E+0 ) )
+      DOUBLE PRECISION   ZERO, ONE
+      PARAMETER          ( ZERO = ( 0.0D+0, 0.0D+0 ),
+     $                     ONE  = ( 1.0D+0, 0.0D+0 ) )
 *
 *     .. Local Scalars ..
       LOGICAL            UPPER, TQUERY, WQUERY
       INTEGER            I, J, K, I1, I2, TD
       INTEGER            LDTB, LWKOPT, NB, KB, NT, IINFO
-      REAL               PIV
+      DOUBLE PRECISION            PIV
 *     ..
 *     .. External Functions ..
       LOGICAL            LSAME
@@ -246,19 +246,19 @@
       END IF
 *
       IF( INFO.EQ.0 ) THEN
-         CALL SSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, -1, IPIV,
-     $                             IPIV2, WORK, -1, INFO )
+         CALL DSYTRF_AA_2STAGE( UPLO, N, A, LDA, TB, -1, IPIV,
+     $                          IPIV2, WORK, -1, INFO )
          LWKOPT = INT( WORK(1) )
          IF( LWORK.LT.LWKOPT .AND. .NOT.WQUERY ) THEN
-            INFO = -10
+            INFO = -13
          END IF
          IF( LTB.LT.INT( TB(1) ) .AND. .NOT.TQUERY ) THEN
-            INFO = -13
+            INFO = -7
          END IF
       END IF
 *
       IF( INFO.NE.0 ) THEN
-         CALL XERBLA( 'SSYSV_AASEN_2STAGE', -INFO )
+         CALL XERBLA( 'DSYSV_AA_2STAGE', -INFO )
          RETURN
       ELSE IF( WQUERY .OR. TQUERY ) THEN
          RETURN
@@ -267,19 +267,19 @@
 *
 *     Compute the factorization A = U*T*U**H or A = L*T*L**H.
 *
-      CALL SSYTRF_AASEN_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV, IPIV2,
-     $                          WORK, LWORK, INFO )
+      CALL DSYTRF_AA_2STAGE( UPLO, N, A, LDA, TB, LTB, IPIV, IPIV2,
+     $                       WORK, LWORK, INFO )
       IF( INFO.EQ.0 ) THEN
 *
 *        Solve the system A*X = B, overwriting B with X.
 *
-         CALL SSYTRS_AASEN_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB, IPIV,
-     $                             IPIV2, B, LDB, INFO )
+         CALL DSYTRS_AA_2STAGE( UPLO, N, NRHS, A, LDA, TB, LTB, IPIV,
+     $                          IPIV2, B, LDB, INFO )
 *
       END IF
 *
       WORK( 1 ) = LWKOPT
 *
-*     End of SSYSV_AASEN_2STAGE
+*     End of DSYSV_AA_2STAGE
 *
       END
