@@ -150,8 +150,8 @@
 *
 *  =====================================================================
 *
-      COMPLEX*16         ONE
-      PARAMETER          ( ONE = 1.0D+0 )
+      COMPLEX*16   ZERO, ONE
+      PARAMETER    ( ZERO = (0.0D+0, 0.0D+0), ONE = (1.0D+0, 0.0D+0) )
 *     ..
 *     .. Local Scalars ..
       LOGICAL            LQUERY, UPPER
@@ -196,8 +196,13 @@
 *
 *     Quick return if possible
 *
-      IF( N.EQ.0 .OR. NRHS.EQ.0 )
-     $   RETURN
+      IF( N.EQ.0 .OR. NRHS.EQ.0 ) THEN
+         RETURN
+      ELSE IF( N.EQ.1 .AND. A( 1, 1 ).NE.ZERO ) THEN
+         CALL ZTRSM( 'L', 'U', 'N', 'N', N, NRHS, ONE, A( 1, 1 ), LDA,
+     $               B( 1, 1 ), LDB)
+         RETURN
+      END IF
 *
       IF( UPPER ) THEN
 *
