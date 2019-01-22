@@ -37,7 +37,7 @@
 *> \verbatim
 *>
 *> SSYTRS_AA solves a system of linear equations A*X = B with a real
-*> symmetric matrix A using the factorization A = U*T*U**T or
+*> symmetric matrix A using the factorization A = U**T*T*U or
 *> A = L*T*L**T computed by SSYTRF_AA.
 *> \endverbatim
 *
@@ -49,7 +49,7 @@
 *>          UPLO is CHARACTER*1
 *>          Specifies whether the details of the factorization are stored
 *>          as an upper or lower triangular matrix.
-*>          = 'U':  Upper triangular, form is A = U*T*U**T;
+*>          = 'U':  Upper triangular, form is A = U**T*T*U;
 *>          = 'L':  Lower triangular, form is A = L*T*L**T.
 *> \endverbatim
 *>
@@ -205,7 +205,7 @@
 *
       IF( UPPER ) THEN
 *
-*        Solve A*X = B, where A = U*T*U**T.
+*        Solve A*X = B, where A = U**T*T*U.
 *
 *        Pivot, P**T * B
 *
@@ -217,7 +217,7 @@
             K = K + 1
          END DO
 *
-*        Compute (U \P**T * B) -> B    [ (U \P**T * B) ]
+*        Compute (U**T \P**T * B) -> B    [ (U**T \P**T * B) ]
 *
          CALL STRSM('L', 'U', 'T', 'U', N-1, NRHS, ONE, A( 1, 2 ), LDA,
      $               B( 2, 1 ), LDB)
@@ -233,12 +233,12 @@
      $              INFO)
 *     
 *
-*        Compute (U**T \ B) -> B   [ U**T \ (T \ (U \P**T * B) ) ]
+*        Compute (U \ B) -> B   [ U \ (T \ (U**T \P**T * B) ) ]
 *
          CALL STRSM( 'L', 'U', 'N', 'U', N-1, NRHS, ONE, A( 1, 2 ), LDA,
      $               B(2, 1), LDB)
 *
-*        Pivot, P * B  [ P * (U**T \ (T \ (U \P**T * B) )) ]
+*        Pivot, P * B  [ P * (U \ (T \ (U**T \P**T * B) )) ]
 *
          K = N
          DO WHILE ( K.GE.1 )

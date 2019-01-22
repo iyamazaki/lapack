@@ -37,7 +37,7 @@
 *> SSYTRF_AA computes the factorization of a real symmetric matrix A
 *> using the Aasen's algorithm.  The form of the factorization is
 *>
-*>    A = U*T*U**T  or  A = L*T*L**T
+*>    A = U**T*T*U  or  A = L*T*L**T
 *>
 *> where U (or L) is a product of permutation and unit upper (lower)
 *> triangular matrices, and T is a symmetric tridiagonal matrix.

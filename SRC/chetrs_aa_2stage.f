@@ -38,7 +38,7 @@
 *> \verbatim
 *>
 *> CHETRS_AA_2STAGE solves a system of linear equations A*X = B with a real
-*> hermitian matrix A using the factorization A = U*T*U**T or
+*> hermitian matrix A using the factorization A = U**T*T*U or
 *> A = L*T*L**T computed by CHETRF_AA_2STAGE.
 *> \endverbatim
 *
@@ -50,7 +50,7 @@
 *>          UPLO is CHARACTER*1
 *>          Specifies whether the details of the factorization are stored
 *>          as an upper or lower triangular matrix.
-*>          = 'U':  Upper triangular, form is A = U*T*U**T;
+*>          = 'U':  Upper triangular, form is A = U**T*T*U;
 *>          = 'L':  Lower triangular, form is A = L*T*L**T.
 *> \endverbatim
 *>
@@ -210,7 +210,7 @@
 *
       IF( UPPER ) THEN
 *
-*        Solve A*X = B, where A = U*T*U**T.
+*        Solve A*X = B, where A = U**T*T*U.
 *
          IF( N.GT.NB ) THEN
 *
